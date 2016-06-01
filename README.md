@@ -1,1 +1,1 @@
-# [pyp-w2] Decorators Toolbox
+# [pyp-w2] Decorators Library
