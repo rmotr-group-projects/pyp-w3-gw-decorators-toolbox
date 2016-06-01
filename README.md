@@ -1,2 +1,1 @@
-# pyp-w3-gw-decorators-toolbox
-An useful set of general purpose decorators
+# [pyp-w2] Decorators Toolbox
