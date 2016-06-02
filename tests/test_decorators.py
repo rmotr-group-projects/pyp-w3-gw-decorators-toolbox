@@ -1,19 +1,14 @@
 # -*- coding: utf-8 -*-
-import os
-import sys
 import time
-import types
-import shutil
 import unittest
-from datetime import date
-from testfixtures import log_capture, LogCapture
+from testfixtures import LogCapture
 
-from decorators_library.main import *
+from decorators_library.decorators import *
 from decorators_library.exceptions import *
 
 
 class DecoratorsTestCase(unittest.TestCase):
-    
+
     def test_timeout_doesnt_raise(self):
         @timeout(2)
         def very_slow_function():
@@ -35,14 +30,14 @@ class DecoratorsTestCase(unittest.TestCase):
         with LogCapture() as capture:
             res = my_add(1, 2)
             capture.check(
-                ('tests.test_main', 'DEBUG', 'Executing "my_add" with params: (1, 2), {}'),
-                ('tests.test_main', 'DEBUG', 'Finished "my_add" execution with result: 3')
+                ('tests.test_decorators', 'DEBUG', 'Executing "my_add" with params: (1, 2), {}'),
+                ('tests.test_decorators', 'DEBUG', 'Finished "my_add" execution with result: 3')
             )
         self.assertEqual(res, 3)
 
     def test_debug_custom_logger(self):
         logging.basicConfig()
-        error_logger = logging.getLogger('test_main.error_logger')
+        error_logger = logging.getLogger('test_decorators.error_logger')
         error_logger.setLevel(logging.ERROR)
 
         @debug(logger=error_logger)
@@ -92,3 +87,16 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(my_func.counter(), 0)
         self.assertEqual(count_calls.counters(), {'my_func': 0})
         count_calls.reset_counters()
+
+    def test_memoized(self):
+        @memoized
+        def add(a, b):
+            return a + b
+
+        self.assertEqual(add(1, 2), 3)
+        self.assertEqual(add(2, 3), 5)
+        self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
+        self.assertEqual(add(1, 2), 3)
+        self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
+        self.assertEqual(add(3, 4), 7)
+        self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
