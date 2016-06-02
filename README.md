@@ -2,7 +2,7 @@
 
 Today we will work with `decorators`. This project aims to be a library of useful, multi purpose decorators.
 
-We provide an initial set of decorators you must to implement, with all their proper test cases, but the interesting thing about this project is that you must also use your imagination and creativity to implement new decorators out of the initial set we provide. Of course, all the new decorators must come with their set of test cases.
+We provide an initial set of decorators you must implement, with all their proper test cases, but the interesting thing about this project is that you must also use your imagination and creativity to implement new decorators out of the initial set we provide. Of course, all the new decorators must come with their own set of test cases.
 
 ## Decorators provided
 
@@ -39,7 +39,7 @@ Finished "my_add" execution with result: 3
 
 ### `count_calls` decorator
 
-Useful to keep track of how many time certain function was called. Example:
+Keeps track of how many times certain function was called. Example:
 
 ```python
 @count_calls
@@ -56,7 +56,7 @@ def my_func():
 
 ### `memoized` decorator
 
-This decorator should keep track of previous executions of the decorated function. If the decorated function is execution again using the same set of arguments sent in the past, the result must be immediately returned by an internal cache instead of re executing the same code again. Example:
+This decorator should keep track of previous executions of the decorated function and the result of the invokations. If the decorated function is execution again using the same set of arguments sent in the past, the result must be immediately returned by an internal cache instead of re executing the same code again. Example:
 
 ```python
 @memoized
