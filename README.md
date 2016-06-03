@@ -1,4 +1,4 @@
-# [pyp-w2] Decorators Library
+# [pyp-w3] Decorators Library
 
 Today we will work with `decorators`. This project aims to be a library of useful, multi purpose decorators.
 
