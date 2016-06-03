@@ -1,14 +1,26 @@
+import time
+from exceptions import TimeoutError
 
-
-
-def timeout():
-    pass
+def timeout(func):
+    
+    
+    def f(num):
+        time = time.clock()
+        while time != num:
+            time = time.clock()
+            return func(num)
+        else:
+            raise TimeoutError("Function call timed out")
 
 
 
 
 def debug():
     pass
+    """
+    print("Executing '{}' with params: '{}'".format(func.__name__, func.__args__))
+    """
+
 
 
 class count_calls(object):
@@ -45,13 +57,22 @@ class count_calls(object):
         cls.all_counters = {}
     
 
-def memoized():
-    pass
+class memoized(object):
+    """
+    Returns a function. Caprutes .
+    """
 
+    def __init__(self, f):
+        self.f = f
+        self.cache = {} # {(1, 2): 3, (2, 3): 5}
 
-# implement your decorators here.
-
-# @memoized
-# def add(a, b):
-#     return a + b
-#     # add(1, 2)
+    def __call__(self, *args):
+        self.f(*args)
+        if not isinstance(args, tuple):
+            raise Exception
+        if not args in self.cache:
+            total = args[0] + args[1]
+            self.cache.update({args: total})
+            return self.cache[args]
+        return self.cache[args]
+        
