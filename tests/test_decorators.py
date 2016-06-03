@@ -2,11 +2,13 @@
 import time
 import unittest
 from testfixtures import LogCapture
+import sys # for testing no_print
 
 from decorators_library.decorators import *
 from decorators_library.exceptions import *
+import pytest
 
-
+@pytest.mark.usefixtures("capsys")
 class DecoratorsTestCase(unittest.TestCase):
 
     def test_timeout_doesnt_raise(self):
@@ -52,7 +54,7 @@ class DecoratorsTestCase(unittest.TestCase):
     def test_count_calls(self):
         @count_calls
         def my_func():
-           pass
+          pass
         my_func()
         my_func()
         my_func()
@@ -64,11 +66,11 @@ class DecoratorsTestCase(unittest.TestCase):
     def test_count_calls_multi_function(self):
         @count_calls
         def my_func():
-           pass
+          pass
 
         @count_calls
         def my_other_func():
-           pass
+          pass
 
         my_func()
         my_func()
@@ -83,7 +85,7 @@ class DecoratorsTestCase(unittest.TestCase):
     def test_count_calls_no_calls(self):
         @count_calls
         def my_func():
-           pass
+          pass
         self.assertEqual(my_func.counter(), 0)
         self.assertEqual(count_calls.counters(), {'my_func': 0})
         count_calls.reset_counters()
@@ -100,3 +102,40 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+        
+    def test_no_print(self):
+        @no_print
+        def mysum(a,b):
+            print('Welcome to the function')
+            result = a + b
+            print('The result is {}'.format(result))
+            return result
+        r = mysum(5,3)
+
+        if not hasattr(sys.stdout, "getvalue"):
+            self.fail("need to run in buffered mode")
+        output = sys.stdout.getvalue().strip() # because stdout is an StringIO instance
+        self.assertEqual(output,'')
+        self.assertEqual(r, 8)
+
+
+    def test_cushion_raises(self):
+            @cushion(3,2)
+            def very_slow_function():
+                time.sleep(2)
+            with self.assertRaisesRegexp(RuntimeError, 'function call limit exceeded'):
+                for i in itertools.count():
+                    if i < 5:
+                        very_slow_function()
+                    else:
+                        break
+                    
+    def test_cushion_doesnt_raise(self):
+            @cushion(3,2)
+            def very_slow_function():
+                time.sleep(2)
+            for i in itertools.count():
+                if i < 4:
+                    very_slow_function()
+                else:
+                    break
