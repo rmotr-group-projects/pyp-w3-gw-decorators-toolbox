@@ -51,12 +51,24 @@ class count_calls(object):
         return count_calls.count[self.func_name]
     
     @classmethod
-    def counters(cls):
-        return cls.count
+    def counters(self):
+        return self.count
     
     @classmethod
-    def reset_counters(cls):
-        cls.count = {}
+    def reset_counters(self):
+        self.count = {}
     
     def __call__(self):
         self.count[self.func_name] += 1
+        
+class memoized(object):
+    def __init__(self, func):
+        self.func = func
+        self.cache = {}
+    def __call__(self, *args):
+        if args in self.cache:
+            return self.cache[args]
+        else:
+            value = self.func(*args)
+            self.cache[args] = value
+            return value
