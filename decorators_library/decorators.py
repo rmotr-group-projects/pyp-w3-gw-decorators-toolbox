@@ -21,6 +21,13 @@ def timeout(seconds=10, error_message='Function call timed out'):
 
     return decorator
     
-def debug(some_function)
-    print("this ")
-    pass
+def debug(func):
+    
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        print('Executing {} with params: {}'.format(func.__name__, args)) 
+        # Need to add {} at the very end. dunno what those are for yet
+        result = func(*args, **kwargs)
+        print('Finished "{}" execution with result: {}'.format(func.__name__, result))
+        return result
+    return wrapper

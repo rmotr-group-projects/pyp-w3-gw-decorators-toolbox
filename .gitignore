@@ -63,3 +63,7 @@ target/
 
 #Virtualenv Folders
 declibpy3/
+
+#Local Machine Tests
+testing.py
+
