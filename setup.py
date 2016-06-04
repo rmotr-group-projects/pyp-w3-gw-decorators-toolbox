@@ -34,7 +34,6 @@ setup(
     tests_require=[
         'pytest==2.9.2',
         'testfixtures==4.10.0'
-
     ],
     zip_safe=False,
     cmdclass={'test': PyTest},
