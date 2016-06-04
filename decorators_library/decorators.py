@@ -1,5 +1,6 @@
 import logging
 import signal
+import warnings
 
 from .exceptions import TimeoutError
 
@@ -92,11 +93,15 @@ def plocker(func):
     '''
     pass
 
-def insecure_function(func):
+
+def insecure_object(func):
     '''
     This decorator will warn people there are security concerns with the decorated function
-    by raising a SecurityError that they'll need to swallow to use the function.
-    Perhaps by adding INSECURE=yes as a parameter?  This decorator then strips that off
-    and runs the function anyway.
+    by raising a warning
     '''
+    def wrapper(*args, **kwargs):
+        warnings.warn("Called insecure object {}.".format(func.__name__),
+                      category=DeprecationWarning)
+        return func(*args, **kwargs)
+    return wrapper
     
