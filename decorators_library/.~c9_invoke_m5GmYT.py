@@ -1,5 +1,7 @@
 import time
 import logging
+
+# from psutils import *
 from functools import wraps
 from decorators_library.exceptions import *
 
@@ -36,14 +38,11 @@ def timeout(time_limit):
 
 def debug(logger=None):
 
-    if not logger: #make a logger if there isnt one
-            logger = logging.getLogger(__name__)
-            
     def decorate(func):
     
         @wraps(func)
         def wrapper(*args, **kwargs):
-            logger.debug('Executing "{}" with params: {}, {}'.format(func.__name__, args, kwargs))
+            logger.debug('Executing "{}" with params: "{}{}"'.format(func._, args, kwargs))
             result = func(*args, **kwargs)
             logger.debug('Finished "{}" execution with result: {}'.format(func.__name__, result))
             return result
@@ -51,44 +50,33 @@ def debug(logger=None):
     return decorate
 
 #replaced original code to use logger and to add layer per python cookbook
-# def debug(func, *args, **kwargs):
-#     print('Executing "{}" with params: "{}, {}"'.format(func.__name__, args, kwargs))
+        f._    
+#     print('Executing "{}" with params: "{}{}"'.format(func.__name__, args, kwargs))
 #     result = func(*args, **kwargs)
 #     print('Finished "{}" execution with result: {}'.format(func.__name__, result))
 #     return result
 
 class count_calls(object):
     
-    #count = 0
-    count_dict = {}
+    count = 0
     
     def __init__(self, f, *args, **kwargs):
-        #self.count = 0
+        self.count = 0
         self.funct = f
-        if not f.__name__ in count_calls.count_dict:
-            count_calls.count_dict[f.__name__] = 0
-    
     
     def __call__(self, *args, **kwargs):
         result = self.funct(*args, **kwargs)
-        count_calls.count_dict[self.funct.__name__] += 1
+        self.count += 1
         return result
-
-    @classmethod    
-    def counters(cls):
-        #return {self.funct :  self.count}
-        return count_calls.count_dict
-        
-    def counter(self):
-        if self.funct.__name__ in count_calls.count_dict:
-            return count_calls.count_dict[self.funct.__name__]
-        else:
-            return 0
-        
     
-    @classmethod    
-    def reset_counters(cls):
-        count_calls.count_dict = {}
+    def counter(self):
+        return self.count
+        
+    def counters(self):
+        return {self.funct :  self.count}
+        
+    def reset_counters(self):
+        self.count = 0
 
 
 
@@ -106,20 +94,28 @@ class memoized(object):
            return self.cache[args]
            
         
+#It was having trouble importing psutils
+        
+# def benchmarkRAM(f, *args, **kwargs):
+#     initial_ram_usage = psutils.virtual_memory()
+#     result = f(*args, **kwargs)
+#     final_ram_usage = psutils.virtual_memory()
+#     print("{} used {}bytes of memory".format(
+#         f.__name__,
+#         final_ram_usage.used - initial_ram_usage.used
+#     ))
 
 
 def check_arg_type(func, *args):
-    def decorated(*args):
-        types = [type(arg) for arg in args]
-        print("Arguments types are {}".format(types))
-        return func(*args)
-    return decorated
+    types = [type(arg) for arg in args]
+    print("Arguments types are {}".format(types))
+    return func(*args)
         
 
 
 def lowercaseArguments(f, *args):
-    def decorated(*args):
-        args = tuple([arg.lower() for arg in args if type(arg) is str])
-        return f(*args)
-    return decorated
+    for arg in args:
+        if type(arg) is str:
+            arg = arg.lower()
+    return f(*args)
     
