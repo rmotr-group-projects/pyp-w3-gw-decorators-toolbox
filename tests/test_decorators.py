@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import time
 import unittest
+import logging
 from testfixtures import LogCapture
 
 from decorators_library.decorators import *

@@ -1,6 +1,7 @@
 from decorators_library.exceptions import *
 from functools import wraps
 import signal 
+import logging
 
 
 def timeout(seconds=10, error_message='Function call timed out'):
@@ -21,13 +22,16 @@ def timeout(seconds=10, error_message='Function call timed out'):
 
     return decorator
     
-def debug(func):
-    
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        print('Executing {} with params: {}'.format(func.__name__, args)) 
-        # Need to add {} at the very end. dunno what those are for yet
-        result = func(*args, **kwargs)
-        print('Finished "{}" execution with result: {}'.format(func.__name__, result))
-        return result
-    return wrapper
+def debug(logger=None):
+    def other(func):
+        def wrapper(*args, **kwargs):
+            result = func(*args, **kwargs)
+            if logger is not None:
+                log = logger
+            else:
+                log = logging.getLogger('tests.test_decorators')
+            log.debug('Executing "{}" with params: {}, {{}}'.format(func.__name__, args)) 
+            log.debug('Finished "{}" execution with result: {}'.format(func.__name__, result))
+            return result
+        return wrapper
+    return other
