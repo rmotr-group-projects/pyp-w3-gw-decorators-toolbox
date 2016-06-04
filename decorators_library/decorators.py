@@ -34,3 +34,29 @@ def debug(logger=None):
             return result
         return wrapper
     return decorate
+    
+class count_calls(object):
+    
+    count = {}
+    
+    def __init__(self, func):
+        self.func_name = func.__name__
+        count_calls.count[self.func_name] = 0
+        
+    def __call__(self):
+        count_calls.count[self.func_name] += 1
+        self.func_name()
+    
+    def counter(self):
+        return count_calls.count[self.func_name]
+    
+    @classmethod
+    def counters(cls):
+        return cls.count
+    
+    @classmethod
+    def reset_counters(cls):
+        cls.count = {}
+    
+    def __call__(self):
+        self.count[self.func_name] += 1
