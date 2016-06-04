@@ -32,7 +32,9 @@ setup(
     packages=['decorators_library'],
     maintainer='rmotr.com',
     tests_require=[
-        'pytest==2.9.1'
+        'pytest==2.9.2',
+        'testfixtures==4.10.0'
+
     ],
     zip_safe=False,
     cmdclass={'test': PyTest},
