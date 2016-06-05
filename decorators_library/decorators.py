@@ -3,7 +3,6 @@ import inspect
 from .exceptions import TimeoutError
 from logging import getLogger
 
-
 class Timeout(object):
     def __init__(self, func, max_time):
         self.func = func
@@ -78,12 +77,14 @@ class memoized:
         
     
 def assert_type(*args, **kwargs):
+    """Decorator that does type checking for each parameter."""
     type_list = list(args)
     type_dict = kwargs
+    
     def decorator(func):
         def wrapper(*args, **kwargs):
             
-            if len(type_list) != len(args) or len(type_dict) != len(kwargs):
+            if len(type_list) + len(type_dict) != len(args) + len(kwargs):
                 expected = len(inspect.getargspec(func).args)
                 received = len(args) + len(kwargs)
                 raise ValueError("Wrong number arguments. Expected: {}; Received: {}".format(expected, received))
@@ -92,9 +93,11 @@ def assert_type(*args, **kwargs):
             type_kwargs = [kwargs[key] for key in type_dict] 
             
             if type_args != type_list or not all([type_dict[key] == kwargs[key] for key in type_dict]):
-                expected = tuple(list(type_list) + [type_dict[key] for key in type_dict])
+                expected = tuple(type_list + [type_dict[key] for key in type_dict])
                 received = tuple(type_args + type_kwargs)
-                raise TypeError("Wrong type. Expected: {}; Received: {}".format(get_type(expected), get_type(received)))
+                error_msg = "Wrong type. Expected: {}; Received: {}".format(get_type(expected), get_type(received))
+                
+                raise TypeError(error_msg) 
                 
             return func(*args, **kwargs)
         return wrapper
@@ -104,7 +107,7 @@ def get_type(type_list):
     return tuple(type_.__name__ for type_ in type_list) 
 
 class running_time:
-    
+    """measures the running time each time the function is called and stores it in a list"""
     def __init__(self, func):
         self.func = func
         self.running_times = []
