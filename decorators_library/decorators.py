@@ -2,7 +2,7 @@
 #import signal
 import time
 import logging
-from exceptions import TimeoutError
+from decorators_library.exceptions import *
 from threading import Thread
 
 # def timeout(seconds): # PROBLEMS: won't raise error
