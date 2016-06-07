@@ -107,20 +107,27 @@ class DecoratorsTestCase(unittest.TestCase):
         def my_add(a, b):
             return a + b
         
-        with self.assertRaisesRegexp(ValueError, 'Wrong number arguments. Expected: 2; Received: 3'):
+        with self.assertRaisesRegexp(ValueError, 'Wrong number of arguments. Expected: 2; Received: 3'):
             my_add(2, 23, 4)
         
-    
+        with self.assertRaisesRegexp(ValueError, 'Wrong number of arguments. Expected: 2; Received: 3'):
+            my_add(2, a=23, b=4)
+        
     def test_assert_type_different_types(self):
         @assert_type(int, int)
         def my_add(a, b):
             return a + b
             
         self.assertEqual(my_add(1,2), 3)
+        
         with self.assertRaises(TypeError):
             my_add("asd", 5)
-        # with self.assertRaisesRegexp(TypeError, "Wrong type. Expected: ('int', 'int'); Received: ('str', 'int')"):
-        #     my_add("ads", 2)
+            
+        with self.assertRaises(TypeError):
+            my_add(b="asd", a=5)
+            
+        with self.assertRaisesRegexp(TypeError, "Wrong type. Expected: \('int', 'int'\); Received: \('str', 'int'\)"):
+            my_add("ads", 2)
         
     def test_running_time(self):
         """tracks the running times for a function"""

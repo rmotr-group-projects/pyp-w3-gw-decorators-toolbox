@@ -2,6 +2,7 @@ import time
 import inspect
 from .exceptions import TimeoutError
 from logging import getLogger
+import signal
 
 class Timeout(object):
     def __init__(self, func, max_time):
@@ -9,12 +10,15 @@ class Timeout(object):
         self.max_time = max_time
     
     def __call__(self, *args, **kwargs):
-        start = time.time()
-        return_val = self.func(*args, **kwargs)
-        end = time.time()
-        
-        if end - start > self.max_time:
+        def handler(signum, frame):
             raise TimeoutError('Function call timed out')
+        
+        # Set the signal handler and a 5-second alarm
+        signal.signal(signal.SIGALRM, handler)
+        signal.alarm(self.max_time)
+        return_val = self.func(*args, **kwargs)
+        signal.alarm(0)  
+        
         return return_val
 
 def timeout(max_time):
@@ -70,9 +74,11 @@ class memoized:
         self.cache = {}
         
     def __call__(self, *args, **kwargs):
+        if tuple(args) in self.cache:
+            return self.cache[args]
+            
         return_val = self.func(*args, **kwargs)
-        call_dict = {tuple(args) : return_val}
-        self.cache.update(call_dict)
+        self.cache[args] = return_val
         return return_val
         
     
@@ -87,7 +93,7 @@ def assert_type(*args, **kwargs):
             if len(type_list) + len(type_dict) != len(args) + len(kwargs):
                 expected = len(inspect.getargspec(func).args)
                 received = len(args) + len(kwargs)
-                raise ValueError("Wrong number arguments. Expected: {}; Received: {}".format(expected, received))
+                raise ValueError("Wrong number of arguments. Expected: {}; Received: {}".format(expected, received))
                 
             type_args = [type(val) for val in args]
             type_kwargs = [kwargs[key] for key in type_dict] 
