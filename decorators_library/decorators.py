@@ -1,5 +1,7 @@
 import logging
-# implement your decorators here.
+# import inspect
+import signal
+from exceptions import TimeoutError
 
 class count_calls(object):
     
@@ -61,18 +63,43 @@ class memoized(object):
     
    
 class debug(object):
-    pass
-    # def init(self, function):
-    #     self.logger = logging.getLogger(function.__name__)
-    #     self.logger.setLevel(logging.DEBUG)
     
-    # def __call__(self, *args, **kwargs):
-    #     self.logger.debug('Executing {1} with params: {2}, {3}')
-    #     pass
-    #
-    #
-    #
-    #
-    #
-    #
-   
+    def __init__(self, logger=None):
+        if logger == None:
+            # line below gets you 'test_decorators', but not 'tests.test_decorators'
+            # giving up after many hours because I don't know and the Net can't tell
+            # me what the magic incantation is to get this string. Hardcoding is my
+            # only option!
+            
+            # caller = inspect.getmodulename(inspect.stack()[1][1])
+            caller = 'tests.test_decorators'
+            self.logger = logging.getLogger(caller)
+            self.logger.setLevel(logging.DEBUG)
+        else:
+            self.logger = logger
+    
+    def __call__(self, function):
+        def wrapper(*args, **kwargs):
+            debug_string = 'Executing "{}" with params: {}, {}'.format(function.__name__, args, kwargs)
+            self.logger.debug(debug_string)
+            result = function(*args)
+            debug_string = 'Finished "{}" execution with result: {}'.format(function.__name__, result)
+            self.logger.debug(debug_string)
+            return result
+        return wrapper
+        
+class timeout(object):
+    def __init__(self, time=1):
+        self.time = time
+    
+    def __call__(self, function):
+        def wrapper(*args, **kwargs):
+            signal.signal(signal.SIGALRM, self.handler)
+            # start the timer
+            signal.alarm(self.time)
+            return function(*args, **kwargs)
+        return wrapper
+        
+    def handler(self, signum, frame):
+        print('Signal handler called with signal', signum)
+        raise TimeoutError("Function call timed out")
