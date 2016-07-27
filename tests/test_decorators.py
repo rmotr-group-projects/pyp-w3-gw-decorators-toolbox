@@ -2,6 +2,7 @@
 import time
 import unittest
 from testfixtures import LogCapture
+from functools import reduce
 
 from decorators_library.decorators import *
 from decorators_library.exceptions import *
@@ -101,6 +102,37 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2, 3): 6, (2, 3): 5, (3, 4): 7})
         
+    def test_conc(self):
+        @concatenate
+        def subtract(*args):
+            return reduce(lambda x, y: x-y, args)
         
+        self.assertEqual(subtract(5,1,2), 512)
+        self.assertEqual(subtract(1,7,2), 172)    
+        self.assertEqual(subtract(8,5,9), 859)
+        self.assertEqual(subtract(4,2,0), '420 blaze it')
         
+    def test_conc_raises(self):
+        @concatenate
+        def subtract():
+            return reduce(lambda x, y: x-y, args)
+        with self.assertRaisesRegexp(TypeError, 'Argument supplied not of type int'):
+            subtract('string')
+            
+    def test_binary_result(self):
+        @binary_result
+        def add(*args):
+            return reduce(lambda x, y: x+y, args)
+        
+        self.assertEqual(add(5,1,13), '0b10011')
+        self.assertEqual(add(1,7), '0b1000')    
+        self.assertEqual(add(8,5,9), '0b10110')
+        self.assertEqual(add(4,2,0), '0b110')
+        
+    def test_binary_result_raises(self):
+        @binary_result
+        def add(*args):
+            return reduce(lambda x, y: x+y, args)
+        with self.assertRaisesRegexp(TypeError, 'Result not of type int'):
+            add(4,2.3)
 

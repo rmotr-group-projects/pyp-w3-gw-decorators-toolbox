@@ -4,7 +4,8 @@ import multiprocessing
 from decorators_library.exceptions import *
 import collections
 import logging     
-        
+
+
 class timeout(object):
     
     def __init__(self, timelimit):
@@ -83,4 +84,30 @@ class memoized(object):
             self.cache[(args)] = result
             return result
             
+            
+#creates a new int based on the numbers passed instead of 
+#whatever behavior existed before, i.e., add(4, 6, 1) now returns 461
+class concatenate:
+    def __init__(self, *args):
+        self.args = args
         
+    
+    def __call__(self, *args):
+        for i in args:
+            if not isinstance(i, (int)):
+                raise TypeError('Argument supplied not of type int')
+        result = int(''.join(map(str, args)))
+        if result == 420:
+            result = str(result) + ' blaze it'
+        return result
+        
+
+#Converts int result of original function to binary string        
+def binary_result(func):
+    def wrapper(*args):
+        result = func(*args)
+        if not isinstance(result, (int)):
+            raise TypeError('Result not of type int')
+        return bin(result)
+    return wrapper
+    
