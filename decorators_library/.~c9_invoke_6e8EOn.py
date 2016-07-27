@@ -26,39 +26,29 @@ def timeout(max_time):
     return decorate
 
 class count_calls(object):
-    dic = {}
     def __init__(self, f):
         # self.counter = 0
         self.f = f
-        # self.dic = {}
-        self.dic[f] = 1
+        self.dic = {}
         
-        # dic = {foo1 : 2, foo2 : 1}
-        # return dic[foo1]  #2
+        # {foo : 0, foo1 : 0}
     def __call__(self, *args, **kwargs):
-        
-        if self.f.__name__ in self.dic:
-            self.dic[self.f.__name__] += 1
-            # self.counter += 1
-        else:
-            self.dic[self.f.__name__] = 1
-        
-        dic = dict(self.dic)
+        def wrapper(args, kwargs):
+            print (self.f.__name__
+            if self.f.__name__ in self.dic:
+                self.dic[self.f.__name__] += 1
+                # self.counter += 1
+            else:
+                self.dic[self.f.__name__] = 1
                 # self.dic + {self.f.__name__ : 1}
-            # return self.f(*args, **kwargs)
+            return self.f(*args, **kwargs)
         # wrapper.counter = 0
-        # print ("HERE {}".format(self.f.__name__))
-        # print ("AGAING {}".format(wrapper.__name))
-        print(self.dic)
+        wrapper.__name__ = self.f.__name__
+def debug():
         
     def counter(self):
-        # print ("HERE")
-        return self.dic[self.f.__name__]
-
-    @classmethod
-    def counters(cls):
-        print cls.dic
-        return dict(cls.dic)
+        print ("HERE")
+        return self.dic[self]
         
         
     
