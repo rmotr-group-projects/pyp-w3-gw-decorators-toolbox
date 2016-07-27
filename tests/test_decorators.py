@@ -2,7 +2,6 @@
 import time
 import unittest
 from testfixtures import LogCapture
-
 from decorators_library.decorators import *
 from decorators_library.exceptions import *
 
