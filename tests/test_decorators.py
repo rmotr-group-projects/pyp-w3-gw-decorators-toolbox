@@ -90,13 +90,17 @@ class DecoratorsTestCase(unittest.TestCase):
 
     def test_memoized(self):
         @memoized
-        def add(a, b):
-            return a + b
+        def add(*args):
+            return sum(args)
 
-        self.assertEqual(add(1, 2), 3)
+        self.assertEqual(add(1, 2, 3), 6)
         self.assertEqual(add(2, 3), 5)
-        self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
-        self.assertEqual(add(1, 2), 3)
-        self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
+        self.assertEqual(add.cache, {(1, 2, 3): 6, (2, 3): 5})
+        self.assertEqual(add(1, 2, 3), 6)
+        self.assertEqual(add.cache, {(1, 2, 3): 6, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
-        self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+        self.assertEqual(add.cache, {(1, 2, 3): 6, (2, 3): 5, (3, 4): 7})
+        
+        
+        
+
