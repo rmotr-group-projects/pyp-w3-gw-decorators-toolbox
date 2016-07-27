@@ -4,30 +4,26 @@ from .exceptions import TimeoutError
 from functools import wraps
 
 class count_calls(object):
-    
     keep_all_counts = {}
     
     def __init__(self, fn):
         self.fn = fn
-        count_calls.keep_all_counts[fn.__name__] = 0
+        self.keep_all_counts[self.fn.__name__] = 0
     
     def __call__(self):
-        count_calls.keep_all_counts[self.fn.__name__] += 1
-        
-        def nested_func():
-            return self.fn()
-        return nested_func
+        self.keep_all_counts[self.fn.__name__] += 1
+        return self.fn
     
     def counter(self):
-        return count_calls.keep_all_counts[self.fn.__name__]
+        return self.keep_all_counts[self.fn.__name__]
     
     @classmethod
     def counters(cls):
-        return count_calls.keep_all_counts
+        return cls.keep_all_counts
     
     @classmethod
     def reset_counters(cls):
-        count_calls.keep_all_counts = {}
+        cls.keep_all_counts = {}
 
 
 class debug(object):
@@ -35,28 +31,26 @@ class debug(object):
     def __init__(self, logger=None):
         self.logger = logger
 
-    def __call__(self, f):
-        #@wraps
-        def nested_func(*args, **kwargs):  #def function(unnamedarg1, unnamedarg2, namedarg1=1, namedarg2='two') args = (1, 2) kwargs = {namedarg:1, namedarg2='two'}
-            ex = 'Executing "{}" with params: {}, {}'.format(f.__name__, args, kwargs)
+    def __call__(self, fn):
+        
+        def debugging(*args, **kwargs):
             if not self.logger:
-                self.logger = logging.getLogger(f.__module__)
+                self.logger = logging.getLogger(fn.__module__)
             
-            result = f(*args, **kwargs)
-            end = 'Finished "{}" execution with result: {}'.format(f.__name__, str(result))
+            name = fn.__name__
+            ex = 'Executing "{}" with params: {}, {}'.format(name, args, kwargs)
+            result = fn(*args, **kwargs)
+            end = 'Finished "{}" execution with result: {}'.format(name, result)
             
-            # load messages to log
             self.logger.debug(ex)
             self.logger.debug(end)
-            
-            
             return result
-        return nested_func
+
+        return debugging
 
 
 class memoized(object):
-    
-    def __init__(self,original_function):
+    def __init__(self, original_function):
         self.original_function = original_function
         self.cache = {}
     
@@ -66,11 +60,10 @@ class memoized(object):
         self.cache[args] = self.original_function(*args,**kwargs)
         return self.original_function(*args,**kwargs)
             
-        
-    
-
+            
 def signal_handler(signalnum, frame):
     raise TimeoutError('Function call timed out')
+
 
 def timeout(timeout_seconds=0):
     """
