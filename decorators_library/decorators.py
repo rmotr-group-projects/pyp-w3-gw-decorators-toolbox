@@ -29,23 +29,33 @@ class debug():
 
 # count calls
 class count_calls():
+    counters_cache = {} #Class global
+    
     def __init__(self, f):
         self.count = 0
         self.f = f
         self.key = f.__name__
         self.cache = {self.key:0}
+        count_calls.counters_cache = self.cache
         
     def __call__(self,*args):
         if self.key in self.cache:
             self.cache[self.key] += 1
+        count_calls.counters_cache[self.key] = self.counter()
         return self.f(*args)
         
     def counter(self):
-        print("I'm in the counter()")
         return self.cache[self.key]
     
-    def counters(self):
-        return self.cache
+    # Used to refer to class global
+    @classmethod
+    def counters(cls):
+        return cls.counters_cache
+        
+    @classmethod
+    def reset_counters(cls):
+        cls.counters_cache = {}
+        return
 
 
 # memoized
