@@ -22,7 +22,7 @@ def timeout(max_time):
             finally:
                 signal.alarm(0)
             return result
-        new_f.func_name = func.func_name
+        new_f.__name__ = func.__name__
         return new_f
     return decorate
 
@@ -38,7 +38,7 @@ class count_calls(object):
         
         if self.f.__name__ in self.__class__.collections_counter:
             self.__class__.collections_counter[self.f.__name__] += 1
-        else:
+        else:# will never reach here --> line 35
             self.__class__.collections_counter[self.f.__name__] = 1
         
     def counter(self):
