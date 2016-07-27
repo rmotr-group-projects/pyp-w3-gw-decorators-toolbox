@@ -52,14 +52,14 @@ class count_calls(object):
     
     def __init__(self, func):
         self.func = func
-        self.__class__.counter_dict[self.func.__name__] = 0
+        self.counter_dict[self.func.__name__] = 0
     
     def __call__(self, *args, **kwargs):
-        self.__class__.counter_dict[self.func.__name__] += 1
+        self.counter_dict[self.func.__name__] += 1
         return self.func(*args, **kwargs)
         
     def counter(self):
-        return self.__class__.counter_dict[self.func.__name__]
+        return self.counter_dict[self.func.__name__]
     
     @classmethod
     def counters(cls):
