@@ -37,8 +37,6 @@ import logging
 
 
 # debug:
-
-
 class debug():
     def __init__(self, logger=None):
         self.logger = logger
@@ -61,9 +59,29 @@ class debug():
 
 
 # count calls
-
-
+class count_calls():
+    def __init__(self, f):
+        self.count = 0
+        self.f = f
+        
+    def __call__(self,*args):
+        self.count += 1
+        return self.f(*args)
+        
+    def counter(self):
+        print("I'm in the counter()")
+        return self.count
 
 
 # memoized
-
+class memoized():
+    def __init__(self, function):
+        self.function = function
+        self.cache = {} #This should be in the following structure {arg:result}
+    def __call__(self, *args):
+        if args in self.cache:
+            return self.cache[args]
+        else:
+            result = self.function(*args)
+            self.cache[args] = result
+            return result       
