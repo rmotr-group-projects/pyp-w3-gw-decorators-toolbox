@@ -2,8 +2,9 @@
 from time import sleep
 import time
 import signal
+import logging
 
-from decorators_library.exceptions import TimeoutError
+from decorators_library.exceptions import *
 
 
 def timeout(max_time):
@@ -25,47 +26,61 @@ def timeout(max_time):
         return new_f
     return decorate
 
+
 class count_calls(object):
-    dic = {}
+    collections_counter = {}
+    
     def __init__(self, f):
-        # self.counter = 0
         self.f = f
-        # self.dic = {}
-        self.dic[f] = 1
+        self.__class__.collections_counter[f.__name__] = 0
         
-        # dic = {foo1 : 2, foo2 : 1}
-        # return dic[foo1]  #2
     def __call__(self, *args, **kwargs):
         
-        if self.f.__name__ in self.dic:
-            self.dic[self.f.__name__] += 1
-            # self.counter += 1
+        if self.f.__name__ in self.__class__.collections_counter:
+            self.__class__.collections_counter[self.f.__name__] += 1
         else:
-            self.dic[self.f.__name__] = 1
-        
-        dic = dict(self.dic)
-                # self.dic + {self.f.__name__ : 1}
-            # return self.f(*args, **kwargs)
-        # wrapper.counter = 0
-        # print ("HERE {}".format(self.f.__name__))
-        # print ("AGAING {}".format(wrapper.__name))
-        print(self.dic)
+            self.__class__.collections_counter[self.f.__name__] = 1
         
     def counter(self):
-        # print ("HERE")
-        return self.dic[self.f.__name__]
+        print("Printing self.counter(): {}".format(self.collections_counter))
+        print("Printing type: {}".format(type(self.collections_counter)))
+        return self.__class__.collections_counter[self.f.__name__]
 
+        
     @classmethod
     def counters(cls):
-        print cls.dic
-        return dict(cls.dic)
+        print("Printing cls.collections_counter: {}".format(cls.collections_counter))
+        print("Printing type: {}".format(type(cls.collections_counter)))
+        return cls.collections_counter
         
+    @classmethod
+    def reset_counters(cls):
+        cls.collections_counter = {}
         
-    
-class debug():
-    pass
 
- 
+class debug():
+    def __init__(self, logger=None):
+        self.logger = logger
+        
+    def __call__(self, f):
+        f_name = f.__name__
+        
+        def wrapper(*args, **kwargs):
+            if self.logger is None:
+                logging.basicConfig()
+                self.logger = logging.getLogger(f.__module__)
+            
+            before = "Executing {}{}{} with params: {}, {}".format('"', f_name,'"', args, kwargs)
+            result = f(*args, **kwargs)
+            after = "Finished {}{}{} execution with result: {}".format('"', f_name,'"',result)
+
+            self.logger.debug(before)
+            self.logger.debug(after)
+                      
+            return result
+        return wrapper
+
+
 class memoized(object):
     def __init__(self, f):
         self.cache = {}
@@ -80,25 +95,3 @@ class memoized(object):
             result = self.f(*args)
             self.cache[key] = result
             return result
-        
-   
-        
-'''
-def func(arg1, arg2, namedarg=name1, namedarg=name2):
-    args = [arg1, arg2]
-    kwargs {namedarg1: name1,
-            namedarg2: name2}
-    args = [func2]
-
-class wrapper(object):
-    def __init__(self, func):
-        self.func = func
-    
-    def __call__(self, *args, **kwargs):
-        do something here
-        result = self.func(*args, **kwargs)
-        do something else
-        return some kind of output
-
-
-'''
