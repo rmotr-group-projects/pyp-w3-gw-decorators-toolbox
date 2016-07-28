@@ -1,6 +1,6 @@
 import logging
 import signal
-from .exceptions import TimeoutError
+from decorators_library.exceptions import TimeoutError
 from functools import wraps
 
 #time out dec
@@ -87,3 +87,26 @@ class memoized():
             result = self.function(*args)
             self.cache[args] = result
             return result
+            
+# Hashing credentials
+class hash_credential():
+    all_users = {}
+    def __init__(self, function):
+        self.function = function
+    
+    def __call__(self, *args):
+        user_combo = self.function(args)
+        for username in user_combo:
+            user_combo[username] = hash(user_combo[username])
+        hash_credential.store_user_combo(user_combo)
+        return user_combo
+
+    @classmethod
+    def user_combos(cls):
+        return cls.all_users
+    
+    @classmethod
+    def store_user_combo(cls, combo):
+        for username in combo:
+            cls.all_users[username] = combo[username]
+        return
