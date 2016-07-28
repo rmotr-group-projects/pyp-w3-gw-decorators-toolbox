@@ -4,7 +4,7 @@ import time
 import signal
 import logging
 
-from decorators_library.exceptions import *
+from exceptions import *
 
 def timeout(max_time):
     '''Track the execution time and raise an exception if the time exceeds 
@@ -39,19 +39,15 @@ class count_calls(object):
         
         if self.f.__name__ in self.__class__.collections_counter:
             self.__class__.collections_counter[self.f.__name__] += 1
-        else:# will never reach here --> line 35
+        else:
             self.__class__.collections_counter[self.f.__name__] = 1
         
     def counter(self):
-        print("Printing self.counter(): {}".format(self.collections_counter))
-        print("Printing type: {}".format(type(self.collections_counter)))
         return self.__class__.collections_counter[self.f.__name__]
 
         
     @classmethod
     def counters(cls):
-        print("Printing cls.collections_counter: {}".format(cls.collections_counter))
-        print("Printing type: {}".format(type(cls.collections_counter)))
         return cls.collections_counter
         
     @classmethod
@@ -103,6 +99,7 @@ class memoized(object):
             result = self.f(*args)
             self.cache[key] = result
             return result
+        
             
 def run_time(func):
     '''Measures the total run time of a function '''
@@ -110,7 +107,6 @@ def run_time(func):
         t1 = time.time()
         result = func(*args, **kwargs)
         t2 = time.time() - t1
-        print('{} ran in: {} sec'.format(func.__name__, t2))
-        return result
+        return int(t2)
         
     return wrapper
