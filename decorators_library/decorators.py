@@ -6,11 +6,11 @@ import logging
 
 from decorators_library.exceptions import *
 
-
 def timeout(max_time):
+    '''Track the execution time and raise an exception if the time exceeds 
+    given timeout range'''
     def decorate(func):
         def handler(signum, frame):
-            # print("Here")
             raise TimeoutError()
             
         def new_f(*args, **kwargs):
@@ -28,6 +28,7 @@ def timeout(max_time):
 
 
 class count_calls(object):
+    '''Keeps track of how many times certain function was called'''
     collections_counter = {}
     
     def __init__(self, f):
@@ -59,6 +60,9 @@ class count_calls(object):
         
 
 class debug():
+    '''Debug the executions of the decorated function by logging a message 
+    before starting the execution including given params, and a second message 
+    after the execution is finished with the returned result'''
     def __init__(self, logger=None):
         self.logger = logger
         
@@ -82,12 +86,16 @@ class debug():
 
 
 class memoized(object):
+    '''keep track of previous executions of the decorated function and the 
+    result of the invokations. If the decorated function is execution again 
+    using the same set of arguments sent in the past, the result must be 
+    immediately returned by an internal cache instead of re executing the 
+    same code again.'''
     def __init__(self, f):
         self.cache = {}
         self.f = f
     
     def __call__(self, *args):
-        #print('cache =',self.cache)
         key = args
         if key in self.cache:
             return self.cache[key]
@@ -95,3 +103,14 @@ class memoized(object):
             result = self.f(*args)
             self.cache[key] = result
             return result
+            
+def run_time(func):
+    '''Measures the total run time of a function '''
+    def wrapper(*args, **kwargs):
+        t1 = time.time()
+        result = func(*args, **kwargs)
+        t2 = time.time() - t1
+        print('{} ran in: {} sec'.format(func.__name__, t2))
+        return result
+        
+    return wrapper
