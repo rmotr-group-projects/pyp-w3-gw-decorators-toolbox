@@ -4,7 +4,7 @@ import time
 import signal
 import logging
 
-from exceptions import *
+from decorators_library.exceptions import *
 
 def timeout(max_time):
     '''Track the execution time and raise an exception if the time exceeds 
