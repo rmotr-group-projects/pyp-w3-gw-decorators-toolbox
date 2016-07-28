@@ -80,7 +80,7 @@ class debug():
             return result
         return wrapper
 
-
+#py
 class memoized(object):
     '''keep track of previous executions of the decorated function and the 
     result of the invokations. If the decorated function is execution again 
@@ -110,3 +110,18 @@ def run_time(func):
         return int(t2)
         
     return wrapper
+
+
+import time
+def addDate(func):
+    def newfunc(*arg, **kw):
+        print("Today is {}. You are calling function \"{}\"".format(time.strftime("%d/%m/%Y"), func.__name__))
+        print("You are on your way towards a great programmer")
+        return func(*arg,**kw)
+    return newfunc
+
+def vectorize(func):
+    '''Receives a list of elements and runs the function on each element'''
+    def g(*args):
+        return [func(el) for el in args]
+    return g

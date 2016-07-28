@@ -100,3 +100,33 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+        
+    def test_runtime(self):
+        @run_time
+        def very_slow_function():
+            time.sleep(3)
+            return time            
+        
+        self.assertEqual(very_slow_function(), 3)
+        
+    def test_addDate(self):
+        @addDate
+        def add(a,b):
+            return a + b
+            
+        @addDate
+        def substract(c,d):
+            return c - d
+        self.assertEqual(add(1,2),3)
+        self.assertEqual(substract(1,2),-1)
+        
+    def test_vector(self):
+        @vectorize
+        def square(a):
+            return a*a
+            
+        @vectorize
+        def greet(name):
+            return "Hello there, {}".format(name)
+        self.assertEqual(square(2,3,4),[4,9,16])
+        self.assertEqual(greet('john'),["Hello there, john"])
