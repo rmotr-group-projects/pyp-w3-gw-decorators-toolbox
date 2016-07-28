@@ -1,9 +1,26 @@
 import logging
+import signal
+from .exceptions import TimeoutError
+from functools import wraps
 
 #time out dec
+def signal_handler(sig, frame):
+    raise TimeoutError("Function call timed out")
 
-
-
+def timeout(timeLimit):
+    def wrapper(function):
+        @wraps(function)
+        def timed_function():
+            signal.signal(signal.SIGALRM, signal_handler)
+            signal.alarm(timeLimit)
+            try:
+                return function()
+            except:
+                raise TimeoutError("Function call timed out")
+            finally:
+                signal.alarm(0)
+        return timed_function
+    return wrapper
 
 # debug:
 class debug():
