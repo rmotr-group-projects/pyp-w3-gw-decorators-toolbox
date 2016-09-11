@@ -2,6 +2,7 @@
 import time
 import unittest
 from testfixtures import LogCapture
+import logging
 
 from decorators_library.decorators import *
 from decorators_library.exceptions import *
@@ -100,3 +101,21 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+
+    def test_int_only(self):
+        @int_only
+        def subtract(a,b):
+            return a - b
+        with self.assertRaisesRegexp(InttypeError, 'Operation not defined for non-integers'):
+            subtract(3, 2.0)
+        with self.assertRaisesRegexp(InttypeError, 'Operation not defined for non-integers'):
+            subtract(3, '2')
+        with self.assertRaisesRegexp(InttypeError, 'Operation not defined for non-integers'):
+            subtract(3, [2])
+    
+    def test_remove_punc(self):
+        @remove_punc
+        def ret_string(in_str):
+            return in_str
+        self.assertEqual(ret_string("!a@b#c$d%e^f&g*h(i)j~k"),'abcdefghijk')
+        self.assertEqual(ret_string("!1@2#3$4%5^f&g*h(i)j~k"),'12345fghijk')
