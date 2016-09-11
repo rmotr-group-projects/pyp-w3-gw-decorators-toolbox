@@ -1,6 +1,6 @@
 # implement your decorators here.
 import time
-from .exceptions import TimeoutError
+from .exceptions import TimeoutError, InttypeError
 import logging
 import signal
 
@@ -72,3 +72,19 @@ class memoized(object):
             return self.cache[args]
     
     
+def int_only(fn):
+    def aux_func(*args):
+        if not all([type(x) == int for x in args]):
+            raise InttypeError("Operation not defined for non-integers")
+        return fn(*args)
+    return aux_func
+
+def remove_punc(fn):
+    import string
+    punc = string.punctuation
+    def new_func(input_str):
+        for char in punc:
+            input_str = input_str.replace(char,'')
+        return fn(input_str)
+    return new_func
+        
