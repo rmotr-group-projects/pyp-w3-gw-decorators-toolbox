@@ -91,7 +91,7 @@ def debug(logger=None):
 
 
 def store_to_file(file_name='myData', default_folder='DataFolder'):
-
+    '''decorator that stores the result of a function in file'''
     def real_dec(func):
 
         def decorator(*args,**kwargs):
@@ -112,13 +112,16 @@ def store_to_file(file_name='myData', default_folder='DataFolder'):
     return real_dec
 
 def word_frequency(word):
-
+    '''counts the frequency of the given word if the function returns string'''
     def real_dec(func):
 
         def dec(*args, **kwargs):
             result = func(*args, **kwargs)
             count = 0
-            result = result.split(' ')
+            if type(result)==str:
+                result = result.split(' ')
+            else:
+                return result
             for x in result:
                 if word.lower() == x.lower():
                     count += 1
