@@ -4,7 +4,6 @@ import signal
 import functools
 from .exceptions import *
 
-
 #debug
 def debug(logger=None):
     
@@ -49,45 +48,6 @@ def timeout(sec=None):
     
         return decorator
         
-#count_calls as a class
-class count_calls(object):
-    
-    def __init__(self, function):
-        self.count_dict = {}
-        self.original_function = function
-        self.f_name = self.original_function.__name__
-    
-    def __call__(self, *args, **kwargs):
-        #print self.count_dict
-        #print self.f_name
-        #print self.count_dict.keys()
-        
-        if self.f_name in self.count_dict.keys():
-            self.count_dict[self.f_name] += 1
-        else:
-            self.count_dict[self.f_name] = 1
-        
-        print self.count_dict
-        
-        return self.original_function(*args, **kwargs)
-    
-    def __get__(self, instance, instancetype):
-        """Implement the descriptor protocol to make decorating instance 
-        method possible.
-
-        """
-        return functools.partial(self.__call__, instance)
-    
-    def counter(self):
-        return self.count_dict[self.f_name]
-    
-    @staticmethod
-    def counters(self):
-        return self.count_dict
-        
-    def reset_counters(self):
-        self.count_dict = {}
- 
 class count_calls(object):
     count_dict = {}
     
@@ -97,9 +57,6 @@ class count_calls(object):
         self.count_dict[self.f_name] = 0
     
     def __call__(self, *args, **kwargs):
-        #print self.count_dict
-        #print self.f_name
-        #print self.count_dict.keys()
         
         if self.f_name in self.count_dict.keys():
             self.count_dict[self.f_name] += 1
@@ -121,4 +78,19 @@ class count_calls(object):
     def reset_counters(self):
         self.count_dict = {}
         
-#memoize as a method?
+#memoize
+
+class memoized(object):
+    
+    def __init__(self, function):
+        self.original_function = function
+        self.cache = {}
+    
+    def __call__(self, *args, **kwargs):
+        
+        if args not in self.cache:
+            self.cache[args] = self.original_function(*args)
+            
+        return self.cache[args]
+        
+        return self.original_function(*args, **kwargs)
