@@ -1,6 +1,7 @@
 import signal
 import logging
 
+from .exceptions import TimeoutError
 
 # implement your decorators here.
 class count_calls(object):
