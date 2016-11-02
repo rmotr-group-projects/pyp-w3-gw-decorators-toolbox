@@ -1,4 +1,4 @@
-from exceptions import TimeoutError
+from .exceptions import TimeoutError
 import time
 import logging
 
