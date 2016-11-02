@@ -1,5 +1,5 @@
 import signal
-import exceptions
+import .exceptions
 import logging
 import time
 
