@@ -110,3 +110,10 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(sub(5,3), 2)
         self.assertEqual(sub(3,5), -2)
         self.assertEqual(sub.__doc__, 'Computes the difference of x and y.\n\nsub has been called 2 times.')
+        
+    def test_type_assert(self):
+        @assert_num_type
+        def add(x,y):
+            return x + y
+        with self.assertRaisesRegexp(ValidTypeError, 'Invalid Type Passed'):
+            add(1, 'a')

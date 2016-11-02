@@ -2,6 +2,7 @@ from functools import wraps
 import signal
 from decorators_library.exceptions import *
 import logging
+import types
         
 
 def memoized(func):
@@ -79,4 +80,13 @@ def count_doc(func):
         return func(*args, **kwargs)
     wrapper.__doc__ = orig_doc + '\n\n{} has never been called.'.format(func.__name__)
     wrapper.count = 0
+    return wrapper
+
+def assert_num_type(func):
+    NumberTypes = (types.IntType, types.FloatType)
+    def wrapper(*args):
+        if all(isinstance(arg, NumberTypes) for arg in args):
+            return func(*args)
+        else:
+            raise ValidTypeError('Invalid Type Passed')
     return wrapper
