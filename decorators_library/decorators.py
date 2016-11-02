@@ -1,6 +1,7 @@
 import logging 
 import time
 import signal
+import functools
 from .exceptions import *
 
 
@@ -48,27 +49,76 @@ def timeout(sec=None):
     
         return decorator
         
-        """
-        record start time
-        run function
-        record stop time
-        
-        time_to_run = stop_time - start_time
-        
-
-       if time_to_run > sec:
-            raise TimeoutError('Function call timed out')
-        """
-"""
-@timeout(1)
-def my_add(a,b):
-    time.sleep(2)
-    return a + b
-    
-print(my_add(1,2))
-"""
-
-
 #count_calls as a class
+class count_calls(object):
+    
+    def __init__(self, function):
+        self.count_dict = {}
+        self.original_function = function
+        self.f_name = self.original_function.__name__
+    
+    def __call__(self, *args, **kwargs):
+        #print self.count_dict
+        #print self.f_name
+        #print self.count_dict.keys()
+        
+        if self.f_name in self.count_dict.keys():
+            self.count_dict[self.f_name] += 1
+        else:
+            self.count_dict[self.f_name] = 1
+        
+        print self.count_dict
+        
+        return self.original_function(*args, **kwargs)
+    
+    def __get__(self, instance, instancetype):
+        """Implement the descriptor protocol to make decorating instance 
+        method possible.
 
+        """
+        return functools.partial(self.__call__, instance)
+    
+    def counter(self):
+        return self.count_dict[self.f_name]
+    
+    @staticmethod
+    def counters(self):
+        return self.count_dict
+        
+    def reset_counters(self):
+        self.count_dict = {}
+ 
+class count_calls(object):
+    count_dict = {}
+    
+    def __init__(self, function):
+        self.original_function = function
+        self.f_name = self.original_function.__name__
+        self.count_dict[self.f_name] = 0
+    
+    def __call__(self, *args, **kwargs):
+        #print self.count_dict
+        #print self.f_name
+        #print self.count_dict.keys()
+        
+        if self.f_name in self.count_dict.keys():
+            self.count_dict[self.f_name] += 1
+        else:
+            self.count_dict[self.f_name] = 1
+        
+        print self.count_dict
+        
+        return self.original_function(*args, **kwargs)
+    
+    def counter(self):
+        return self.count_dict[self.f_name]
+    
+    @classmethod
+    def counters(self):
+        return self.count_dict
+    
+    @classmethod
+    def reset_counters(self):
+        self.count_dict = {}
+        
 #memoize as a method?
