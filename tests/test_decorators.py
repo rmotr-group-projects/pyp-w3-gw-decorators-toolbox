@@ -127,7 +127,13 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual('<div class="outer"><div class="inner"><span>'
                          '<p>Hello decorator world!</p></span></div></div>', say_hello())
 
-
+    def test_execution_time(self):
+        @execution_time()
+        def example_function():
+            time.sleep(1)
+        
+        self.assertEqual(example_function(), 1.0)
+    
 def pretty_result(original_function):
     def wrapper(*args):
         return "The result of the function '{}' is: {}" \
@@ -156,4 +162,3 @@ class ConditionalDecoratorTestCase(unittest.TestCase):
     def test_condition_false(self):
         self.assertEqual(
             self.subtract(13, 8), 5)
-

@@ -1,6 +1,6 @@
 import signal
 import logging
-
+import time
 from .exceptions import TimeoutError
 
 # implement your decorators here.
@@ -140,4 +140,21 @@ class html_wraps(object):
     def __call__(self, fn):
         def wrapper(*args, **kwargs):
             return self.template.format(fn(*args, **kwargs))
+        return wrapper
+
+class execution_time(object):
+    """
+    This decorator shows how long a function takes to execute at runtime.
+    """
+    def __call__(self, fn):
+        def wrapper(*args, **kwargs):
+            print("The execution time of {} is:".format(fn.__name__))
+            _t0 = time.time()
+            _run_function = fn(*args, **kwargs)
+            _t1 = time.time()
+            
+            total_time = round(_t1 - _t0, 2)
+            print('{} seconds.'.format(total_time))
+            
+            return total_time
         return wrapper
