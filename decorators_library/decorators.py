@@ -49,8 +49,8 @@ def timeout(limit, func = None):
     def timefun(*args, **kwargs):
         signal.signal(signal.SIGALRM, alarm) 
         signal.alarm(limit)
-        res = func(*args, **kwargs)
-        signal.alarm(0)
+        try: res = func(*args, **kwargs)
+        finally: signal.alarm(0)
         return res
     return timefun
     
