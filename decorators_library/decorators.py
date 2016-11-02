@@ -63,8 +63,6 @@ class count_calls(object):
         else:
             self.count_dict[self.f_name] = 1
         
-        print self.count_dict
-        
         return self.original_function(*args, **kwargs)
     
     def counter(self):
