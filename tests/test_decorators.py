@@ -6,7 +6,6 @@ from testfixtures import LogCapture
 from decorators_library.decorators import *
 from decorators_library.exceptions import *
 
-
 class DecoratorsTestCase(unittest.TestCase):
 
     def test_timeout_doesnt_raise(self):
