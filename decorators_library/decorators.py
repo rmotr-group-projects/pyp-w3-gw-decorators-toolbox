@@ -21,7 +21,7 @@ class count_calls(object):
         self._counters[func.__name__] = 0
         self.func = func
         
-   
+        
     def __call__(self, *args, **kwargs):
         self._counters[self.func.__name__] += 1
         return self.func(*args, **kwargs)
@@ -70,3 +70,13 @@ class debug(object):
             return result
         return wrapper
         
+def count_doc(func):
+    orig_doc = func.__doc__
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        wrapper.count += 1
+        wrapper.__doc__ = orig_doc + '\n\n{} has been called {} times.'.format(func.__name__, wrapper.count)
+        return func(*args, **kwargs)
+    wrapper.__doc__ = orig_doc + '\n\n{} has never been called.'.format(func.__name__)
+    wrapper.count = 0
+    return wrapper
