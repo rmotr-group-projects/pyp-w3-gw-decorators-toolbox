@@ -1,11 +1,11 @@
 import signal
-import . exceptions
+from .exceptions import TimeoutError
 import logging
 import time
 
 def timeout_occured(signum, frame):
     if timeout.running:
-        raise exceptions.TimeoutError('Function call timed out')
+        raise TimeoutError('Function call timed out')
     
 def timeout(time):
     def timeout_decorator(func):
