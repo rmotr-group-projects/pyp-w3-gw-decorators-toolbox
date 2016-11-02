@@ -100,3 +100,60 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+
+    def test_html_wraps_default(self):
+        @html_wraps(template=None)
+        def say_hello():
+            return '<p>Hello decorator world!</p>'
+
+        self.assertIn('<body>\n<p>Hello decorator world!</p>\n</body', say_hello())
+
+
+    def test_html_wraps_custom_template(self):
+        @html_wraps(template='<div>{}</div>')
+        def say_hello():
+            return '<p>Hello decorator world!</p>'
+
+        self.assertEqual('<div><p>Hello decorator world!</p></div>', say_hello())
+
+    def test_abuse_html_wraps(self):
+        # Having some fun chaining decorators :)
+        @html_wraps(template='<div class="outer">{}</div>')
+        @html_wraps(template='<div class="inner">{}</div>')
+        @html_wraps(template='<span>{}</span>')
+        def say_hello():
+            return '<p>Hello decorator world!</p>'
+
+        self.assertEqual('<div class="outer"><div class="inner"><span>'
+                         '<p>Hello decorator world!</p></span></div></div>', say_hello())
+
+
+def pretty_result(original_function):
+    def wrapper(*args):
+        return "The result of the function '{}' is: {}" \
+            .format(original_function.__name__, original_function(*args))
+    return wrapper
+
+
+class ConditionalDecoratorTestCase(unittest.TestCase):
+    """
+    Test the on_condition decorator with the pretty_result function
+    being decorated conditionally on 'condition' param
+    """
+    @staticmethod
+    @on_condition(pretty_result, True)
+    def add(x, y):
+        return x + y
+
+    @staticmethod
+    @on_condition(pretty_result, False)
+    def subtract(x, y):
+        return x - y
+
+    def test_condition_true(self):
+        self.assertEqual(self.add(2, 5), "The result of the function 'add' is: 7")
+
+    def test_condition_false(self):
+        self.assertEqual(
+            self.subtract(13, 8), 5)
+
