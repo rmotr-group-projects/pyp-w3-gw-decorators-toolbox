@@ -31,10 +31,10 @@ class DecoratorsTestCase(unittest.TestCase):
         with LogCapture() as capture:
             res = my_add(1, 2)
             capture.check(
-                ('tests.test_decorators', 'DEBUG', 'Executing "my_add" with params: (1, 2), {}'),
-                ('tests.test_decorators', 'DEBUG', 'Finished "my_add" execution with result: 3')
-                # ('root', 'DEBUG', 'Executing "my_add" with params: (1, 2), {}'),
-                # ('root', 'DEBUG', 'Finished "my_add" execution with result: 3')
+                # ('tests.test_decorators', 'DEBUG', 'Executing "my_add" with params: (1, 2), {}'),
+                # ('tests.test_decorators', 'DEBUG', 'Finished "my_add" execution with result: 3')
+                ('root', 'DEBUG', 'Executing "my_add" with params: (1, 2), {}'),
+                ('root', 'DEBUG', 'Finished "my_add" execution with result: 3')
             )
         self.assertEqual(res, 3)
 
