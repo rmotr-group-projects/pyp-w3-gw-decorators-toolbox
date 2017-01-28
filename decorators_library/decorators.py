@@ -1,6 +1,6 @@
 import time
 import signal
-from exceptions import TimeoutError
+from . exceptions import TimeoutError
 import logging
 from testfixtures import LogCapture
 import resource
