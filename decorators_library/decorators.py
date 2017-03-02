@@ -1,7 +1,7 @@
 import time
 import multiprocessing.pool
 import logging
-from exceptions import TimeoutError
+from decorators_library.exceptions import *
 
 
 class timeout(object):
