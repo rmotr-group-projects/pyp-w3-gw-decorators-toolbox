@@ -100,3 +100,37 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+
+    def test_upper_case(self):
+        
+        @upper_case()
+        def this():
+            return "This is a string."
+            
+        self.assertEqual(this(), "THIS IS A STRING.")
+        
+    def test_upper_case_exception(self):
+        
+        @upper_case()
+        def this():
+            return 1
+           
+        with self.assertRaisesRegexp(ValueError, 'Original function did not return a string.'):
+            this()
+            
+    def test_upper_case_limit(self):
+        
+        @upper_case(limit=6)
+        def this():
+            return "This is a string."
+            
+        self.assertEqual(this(), "THIS I")
+        
+    def test_no_spaces(self):
+        
+        @no_spaces
+        def this():
+            return "This is a string."
+            
+        self.assertEqual(this(), "This_is_a_string.")
+        
