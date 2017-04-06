@@ -3,8 +3,7 @@ import time
 import unittest
 from testfixtures import LogCapture
 
-from decorators_library.decorators import *
-from decorators_library.exceptions import *
+from decorators_library import *
 
 
 class DecoratorsTestCase(unittest.TestCase):
@@ -100,3 +99,21 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+
+    def test_count_doc(self):
+        @count_doc
+        def sub(x, y):
+            """Computes the difference of x and y."""
+            return x - y
+            
+        self.assertEqual(sub.__doc__, 'Computes the difference of x and y.\n\nsub has never been called.')
+        self.assertEqual(sub(5,3), 2)
+        self.assertEqual(sub(3,5), -2)
+        self.assertEqual(sub.__doc__, 'Computes the difference of x and y.\n\nsub has been called 2 times.')
+        
+    def test_type_assert(self):
+        @assert_num_type
+        def add(x,y):
+            return x + y
+        with self.assertRaisesRegexp(ValidTypeError, 'Invalid Type Passed'):
+            add(1, 'a')
