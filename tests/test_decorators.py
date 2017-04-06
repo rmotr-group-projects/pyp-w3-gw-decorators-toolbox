@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import time
 import unittest
+import logging
 from testfixtures import LogCapture
 
 from decorators_library.decorators import *
@@ -100,3 +101,38 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+
+    def test_stopwatch(self):
+        @stopwatch
+        def add(a, b):
+            return a + b
+        add(1,3) 
+
+        self.assertTrue(add.elapsed_time > 0)
+        
+    def test_reverse_string(self):
+        @reverse
+        def string_returner(a):
+            return a
+            
+        a = 'Hello everyone!'
+        
+        self.assertEqual(string_returner(a), a[::-1])
+        
+    def test_reverse_list(self):
+        @reverse
+        def list_returner(a):
+            return a
+            
+        a = [4,1,'dog', 'shark', 4, (3,4)]
+        
+        self.assertEqual(list_returner(a), a[::-1])
+    
+    def test_reverse_tuple(self):
+        @reverse
+        def tuple_returner(a):
+            return a
+            
+        a = (4,2,(3,4),'dog', 'house')
+        
+        self.assertEqual(tuple_returner(a), a[::-1])
