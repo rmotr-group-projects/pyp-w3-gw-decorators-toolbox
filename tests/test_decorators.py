@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+import re
 import unittest
 from testfixtures import LogCapture
 
@@ -30,8 +31,10 @@ class DecoratorsTestCase(unittest.TestCase):
         with LogCapture() as capture:
             res = my_add(1, 2)
             capture.check(
-                ('tests.test_decorators', 'DEBUG', 'Executing "my_add" with params: (1, 2), {}'),
-                ('tests.test_decorators', 'DEBUG', 'Finished "my_add" execution with result: 3')
+                # ('tests.test_decorators', 'DEBUG', 'Executing "my_add" with params: (1, 2), {}'),
+                # ('tests.test_decorators', 'DEBUG', 'Finished "my_add" execution with result: 3')
+                ('root', 'DEBUG', 'Executing "my_add" with params: (1, 2), {}'),
+                ('root', 'DEBUG', 'Finished "my_add" execution with result: 3')
             )
         self.assertEqual(res, 3)
 
@@ -100,3 +103,26 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+
+    def test_performance(self):
+        @performance
+        def slow_fat(x):
+            time.sleep(2)
+            mem_user = [x for x in range(10*x)]
+
+        test = slow_fat(5)
+        pattern = re.compile("^Function '[a-zA-Z_-]+' took [0-9.]+ seconds and used [0-9.]+ [KMB]+ of memory.")
+        assert pattern.match(test), test
+        
+        test = slow_fat(9)
+        assert pattern.match(test), test
+        
+    def test_convert_type(self):
+        @check_type(int, float)
+        def multiply(a, b):
+            return a * b
+            
+        self.assertEqual(multiply(2, 4), 8)
+        self.assertEqual(multiply('2', 4), 8)
+        self.assertEqual(multiply(5, '6'), 30)
+        #self.assertRaisesRegexp(multiply('seven', 3), ValueError, "invalid literal for int() with base 10: 'seven'")
