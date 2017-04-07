@@ -4,17 +4,19 @@ import logging
 from . exceptions import TimeoutError
 from datetime import datetime as dt
 
-def timeout(limit):
-    def outer_wrapper(func):
+class timeout(object):
+    def __init__(self, timeout):
+        self.timeout = timeout
+    
+    def __call__(self, func):
         def wrapper(*args, **kwargs):
             start = t.time()
             func(*args, **kwargs)
             end = t.time()
-            if limit < (end-start):
+            if (end-start) > self.timeout:
                 raise TimeoutError
             return func(*args, **kwargs)
         return wrapper
-    return outer_wrapper
     
 class debug(object):
     def __init__(self, logger=None):
@@ -93,3 +95,31 @@ class timelog(object):
     @classmethod
     def clear_log(cls):
         cls.log = {}
+        
+class opposite(object):
+    def __init__(self, func):
+        self.func = func
+    
+    def __call__(self, *args):
+        new_args = []
+        for arg in args:
+            new_args.insert(0,arg)
+        return self.func(*new_args)
+        
+
+class validarg(object):
+    def __init__(self, *types):
+        self.types = types
+        
+    def __call__(self, func, *args):
+        def wrapper(*args):
+            if len(self.types) != len(args):
+                raise IndexError(
+                    "Invalid, requires {} arguments, was given {}: {}".format(
+                    len(self.types), len(args), args))
+            for (x, y) in zip(args, self.types):
+                if not isinstance(x, y): 
+                    raise TypeError(
+                        "Invalid, argument '{}' is not of {}".format(x, y))
+            return func(*args)
+        return wrapper

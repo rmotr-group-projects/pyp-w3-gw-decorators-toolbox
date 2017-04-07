@@ -101,6 +101,19 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+        
+    def test_memoized_sub(self):
+        @memoized
+        def subtract(a, b):
+            return a - b
+
+        self.assertEqual(subtract(3, 2), 1)
+        self.assertEqual(subtract(1, 3), -2)
+        self.assertEqual(subtract.cache, {(3, 2): 1, (1, 3): -2})
+        self.assertEqual(subtract(3, 2), 1)
+        self.assertEqual(subtract.cache, {(3, 2): 1, (1, 3): -2})
+        self.assertEqual(subtract(6, 4), 2)
+        self.assertEqual(subtract.cache, {(3, 2): 1, (1, 3): -2, (6, 4): 2})
 
     def test_time_log(self):
         @timelog
@@ -136,4 +149,34 @@ class DecoratorsTestCase(unittest.TestCase):
                 ]
         })
         
-    
+    def test_opposite(self):
+        @opposite
+        def thing(a, b, c, d):
+            return a + b - c * d
+
+        @opposite
+        def anotherthing(a, b):
+            return "{} {}'s Flying Circus".format(a, b)
+            
+        self.assertEqual(thing(1, 2, 3, 4), 5)
+        self.assertEqual(anotherthing('Monty', 'Python'), "Python Monty's Flying Circus")
+            
+    def test_validarg(self):
+        @validarg((int, float), (int, float))
+        def add(x, y):
+            return x + y
+            
+        @validarg(str, str)
+        def concat(x, y):
+            return x + y
+            
+        self.assertEqual(add(1,1), 2)
+        with self.assertRaises(TypeError):
+            add(1,'1')
+        with self.assertRaises(IndexError):
+            add(1, 2, 3)
+        self.assertEqual(concat('abc', '123'), 'abc123')
+        with self.assertRaises(TypeError):
+            concat('1', 1)
+        with self.assertRaises(IndexError):
+            concat('a')
