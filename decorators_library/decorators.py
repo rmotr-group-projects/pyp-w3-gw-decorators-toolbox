@@ -1,7 +1,7 @@
 # implement your decorators here.
 import time as t
 import logging
-from exceptions import TimeoutError
+from . exceptions import TimeoutError
 from datetime import datetime as dt
 
 def timeout(limit):
