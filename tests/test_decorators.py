@@ -2,6 +2,7 @@
 import time
 import unittest
 from testfixtures import LogCapture
+from datetime import datetime as dt
 
 from decorators_library.decorators import *
 from decorators_library.exceptions import *
@@ -100,3 +101,39 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+
+    def test_time_log(self):
+        @timelog
+        def something():
+            pass
+        
+        @timelog
+        def something_else():
+            pass
+        
+        something()
+        something()
+        something_else()
+        time = dt.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.assertEqual(something.get_one_log(), [
+                'something called at {}'.format(time),
+                'something called at {}'.format(time)
+                ])
+        self.assertEqual(timelog.get_log(), {
+            'something': [
+                'something called at {}'.format(time),
+                'something called at {}'.format(time)
+                ],
+            'something_else': [
+                'something_else called at {}'.format(time)
+                ]
+        })
+        timelog.clear_log()
+        something_else()
+        self.assertEqual(timelog.get_log(), {
+            'something_else': [
+                'something_else called at {}'.format(time)
+                ]
+        })
+        
+    
