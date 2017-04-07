@@ -100,3 +100,33 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+
+    def test_param_type(self):
+        @paramtype
+        def some_func(a):
+            return a
+
+        self.assertEqual(some_func(1), "some_func was called with int: 1")
+        self.assertEqual(some_func(3.14), "some_func was called with float: 3.14")
+        self.assertEqual(some_func("hello"), "some_func was called with str: hello")
+        self.assertEqual(some_func([1,2,3]), "some_func was called with list: [1, 2, 3]")
+
+    def test_repeat(self):
+        @repeat_x_times(repeats=3)
+        def add(a, b):
+            return a + b
+
+        self.assertEqual(add(2,3), 15)
+        self.assertEqual(add(-8,-2),-30)
+
+        @repeat_x_times(repeats=4)
+        def multiply(a, b):
+            return a * b
+
+        self.assertEqual(multiply(3,4), 48)
+        self.assertEqual(multiply(-1,8), -32)
+
+        @repeat_x_times()
+        def subtract(a, b):
+            return a - b
+        self.assertEqual(subtract(10, 2), 8)
