@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import time
 import unittest
+import threading
 from testfixtures import LogCapture
-
+from datetime import datetime as dt
 from decorators_library.decorators import *
 from decorators_library.exceptions import *
 
@@ -100,3 +101,119 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+        
+    def test_memoized_sub(self):
+        @memoized
+        def subtract(a, b):
+            return a - b
+
+        self.assertEqual(subtract(3, 2), 1)
+        self.assertEqual(subtract(1, 3), -2)
+        self.assertEqual(subtract.cache, {(3, 2): 1, (1, 3): -2})
+        self.assertEqual(subtract(3, 2), 1)
+        self.assertEqual(subtract.cache, {(3, 2): 1, (1, 3): -2})
+        self.assertEqual(subtract(6, 4), 2)
+        self.assertEqual(subtract.cache, {(3, 2): 1, (1, 3): -2, (6, 4): 2})
+
+    def test_time_log(self):
+        @timelog
+        def something():
+            pass
+        
+        @timelog
+        def something_else():
+            pass
+        
+        something()
+        something()
+        something_else()
+        time = dt.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.assertEqual(something.get_one_log(), [
+                'something called at {}'.format(time),
+                'something called at {}'.format(time)
+                ])
+        self.assertEqual(timelog.get_log(), {
+            'something': [
+                'something called at {}'.format(time),
+                'something called at {}'.format(time)
+                ],
+            'something_else': [
+                'something_else called at {}'.format(time)
+                ]
+        })
+        timelog.clear_log()
+        something_else()
+        self.assertEqual(timelog.get_log(), {
+            'something_else': [
+                'something_else called at {}'.format(time)
+                ]
+        })
+        
+    def test_opposite(self):
+        @opposite
+        def thing(a, b, c, d):
+            return a + b - c * d
+
+        @opposite
+        def anotherthing(a, b):
+            return "{} {}'s Flying Circus".format(a, b)
+            
+        self.assertEqual(thing(1, 2, 3, 4), 5)
+        self.assertEqual(anotherthing('Monty', 'Python'), "Python Monty's Flying Circus")
+            
+    def test_validarg(self):
+        @validarg((int, float), (int, float))
+        def add(x, y):
+            return x + y
+            
+        @validarg(str, str)
+        def concat(x, y):
+            return x + y
+            
+        self.assertEqual(add(1,1), 2)
+        with self.assertRaises(TypeError):
+            add(1,'1')
+        with self.assertRaises(IndexError):
+            add(1, 2, 3)
+        self.assertEqual(concat('abc', '123'), 'abc123')
+        with self.assertRaises(TypeError):
+            concat('1', 1)
+        with self.assertRaises(IndexError):
+            concat('a')
+            
+    def test_syncd(self):
+        total = {'t': 0}
+        @sync
+        def count():
+            current = total['t'] + 1
+            time.sleep(0.1)
+            total['t'] = current
+
+        def counter():
+            for _ in range(10):
+                count()
+
+        t1 = threading.Thread(target=counter)
+        t2 = threading.Thread(target=counter)
+        
+        t1.start()
+        t2.start()
+        
+        t1.join()
+        t2.join()
+ 
+        self.assertEqual(total['t'], 20)
+        
+        t3 = threading.Thread(target=counter)
+        t4 = threading.Thread(target=counter)
+        t5 = threading.Thread(target=counter)
+        
+        t3.start()
+        t4.start()
+        t5.start()
+        
+        t3.join()
+        t4.join()
+        t5.join()
+        
+        self.assertEqual(total['t'], 50)
