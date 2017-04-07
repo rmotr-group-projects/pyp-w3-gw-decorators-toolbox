@@ -100,3 +100,9 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+
+    def test_timethis(self):
+        @timethis
+        def add(a, b):
+            return a + b
+        
