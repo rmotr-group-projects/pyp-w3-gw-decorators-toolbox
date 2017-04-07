@@ -100,3 +100,33 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+        
+    def test_time_benchmark(self):
+        @time_benchmark
+        def add(a, b):
+            return a + b
+            
+        self.assertEqual(add(1,2), "Result: 3, Time taken: 00 s")
+        self.assertEqual(add(2,3), "Result: 5, Time taken: 00 s")
+        
+    def test_multiplier(self):
+        @multiplier(3)
+        def a_str(str):
+            return str
+        
+        @multiplier(3)
+        def anint(n):
+            return n
+            
+        self.assertEqual(anint(3), 9)
+        self.assertEqual(a_str('Hello World!'), 'Hello World!Hello World!Hello World!')
+    
+    def test_pokedex(self):
+        @pokedex
+        def pokemon(str):
+            return str
+        
+        self.assertEqual(pokemon("Pikachu"), "Pikachu is a Pokemon!")
+        self.assertEqual(pokemon("Charmander"), "Charmander is a Pokemon!")
+        self.assertEqual(pokemon("Luke Skywalker"), "Luke Skywalker is not a Pokemon :(")
+        self.assertEqual(pokemon("Donald Trump"), "Donald Trump is not a Pokemon :(")
