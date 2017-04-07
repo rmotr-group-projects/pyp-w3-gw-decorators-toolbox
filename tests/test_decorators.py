@@ -18,9 +18,12 @@ class DecoratorsTestCase(unittest.TestCase):
     def test_timeout_raises(self):
         @timeout(1)
         def very_slow_function():
-            time.sleep(2)
+            time.sleep(3)
+        before_exec = time.time()
         with self.assertRaisesRegexp(TimeoutError, 'Function call timed out'):
             very_slow_function()
+        after_exec = time.time()
+        self.assertTrue(after_exec - before_exec < 2, 'Function did not timeout properly.')
 
     def test_debug_default_logger(self):
         @debug()
