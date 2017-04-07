@@ -1,6 +1,7 @@
 # implement your decorators here.
 import time as t
 import logging
+import threading
 from . exceptions import TimeoutError
 from datetime import datetime as dt
 
@@ -123,3 +124,16 @@ class validarg(object):
                         "Invalid, argument '{}' is not of {}".format(x, y))
             return func(*args)
         return wrapper
+        
+class sync(object):
+    def __init__(self, func):
+        self.func = func
+        self.lock = threading.Lock()
+        
+    def __call__(self, *args, **kwargs):
+        self.lock.acquire()
+        try:
+            return self.func(*args, **kwargs)
+        finally:
+            self.lock.release()
+        return self.func(*args, **kwargs)

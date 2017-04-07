@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import time
 import unittest
+import threading
 from testfixtures import LogCapture
 from datetime import datetime as dt
-
 from decorators_library.decorators import *
 from decorators_library.exceptions import *
 
@@ -180,3 +180,40 @@ class DecoratorsTestCase(unittest.TestCase):
             concat('1', 1)
         with self.assertRaises(IndexError):
             concat('a')
+            
+    def test_syncd(self):
+        total = {'t': 0}
+        @sync
+        def count():
+            current = total['t'] + 1
+            time.sleep(0.1)
+            total['t'] = current
+
+        def counter():
+            for _ in range(10):
+                count()
+
+        t1 = threading.Thread(target=counter)
+        t2 = threading.Thread(target=counter)
+        
+        t1.start()
+        t2.start()
+        
+        t1.join()
+        t2.join()
+ 
+        self.assertEqual(total['t'], 20)
+        
+        t3 = threading.Thread(target=counter)
+        t4 = threading.Thread(target=counter)
+        t5 = threading.Thread(target=counter)
+        
+        t3.start()
+        t4.start()
+        t5.start()
+        
+        t3.join()
+        t4.join()
+        t5.join()
+        
+        self.assertEqual(total['t'], 50)
