@@ -123,23 +123,22 @@ class memoized(object):
             
 def minimum_runtime(seconds):
     '''This decorator slows down the execution of a given function.'''
+    def decorated_function(func):
     
-  def decorated_function(func):
-    
-    def wrapper(*args, **kwargs):
-      start = time.time()
-      result = func(*args, **kwargs)
-      runtime = time.time() - start
-    
-      if runtime < seconds:
-        time.sleep(seconds - runtime)
-    
-      return result
-    
-    return wrapper
-  
-  return decorated_function
-  
+        def wrapper(*args, **kwargs):
+          start = time.time()
+          result = func(*args, **kwargs)
+          runtime = time.time() - start
+        
+          if runtime < seconds:
+            time.sleep(seconds - runtime)
+        
+          return result
+        
+        return wrapper
+      
+    return decorated_function
+      
   
 '''
 For the first time during the course, I was not able to complete
