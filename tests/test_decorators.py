@@ -100,3 +100,22 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+        
+    def test_add_one_to_inputs(self):
+        @add_one_to_inputs
+        def add(a, b):
+            return a + b
+            
+        self.assertEqual(add(1,2), 5)
+        self.assertEqual(add(5,6), 13)
+        self.assertNotEqual(add(1,1), 2)
+    
+    def test_randomize_inputs(self):
+        @randomize_inputs
+        def multiply(a, b):
+            return a * b
+            
+        self.assertNotEqual(multiply(2,3), 6)
+        self.assertNotEqual(multiply(3,4), 12)
+
+    
