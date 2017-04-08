@@ -4,6 +4,7 @@ from .exceptions import *
 import logging
 import functools
 from collections import defaultdict
+import random
 
 
 # implement your decorators here.
@@ -97,6 +98,21 @@ class memoized():
             return result
     
 
+def add_one_to_inputs(func):
+    ''' adds one to the function inputs... Why?
+        Thats up to you!
+    '''
+    def wrapper(x, y):
+        return func(x+1, y+1)
+    return wrapper
+    
+    
+def randomize_inputs(func):
+    def wrapper(x, y):
+        rand_x = random.randint(2, 10) * x
+        rand_y = random.randint(2, 10) * y
+        return func(rand_x, rand_y)
+    return wrapper
 # my_func(1, 2, 3, other=4, stuff=5)
 # args = (1, 2, 3)
 # kwargs = {'other': 4, 'stuff': 5}
