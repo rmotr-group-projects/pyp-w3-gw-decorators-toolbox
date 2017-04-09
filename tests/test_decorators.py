@@ -3,8 +3,8 @@ import time
 import unittest
 from testfixtures import LogCapture
 
-from decorators import *
-from exceptions import *
+from decorators_library.decorators import *
+from decorators_library.exceptions import *
 
 
 class DecoratorsTestCase(unittest.TestCase):
