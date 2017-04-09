@@ -100,3 +100,70 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+        
+    def test_time_me_funct_does_nothing(self):
+        @time_me
+        def nothing_funct():
+            pass
+        nothing_funct()
+        
+        self.assertEqual(round(nothing_funct.timed), 0)
+        
+    def test_time_me_funct_one_sec(self):
+        @time_me
+        def second_funct():
+            time.sleep(1)
+            
+        second_funct()
+        
+        self.assertEqual(round(second_funct.timed), 1)
+        
+    def test_time_me_funct_two_sec(self):
+        @time_me
+        def two_sec_funct():
+            time.sleep(2)
+            
+        two_sec_funct()
+        
+        self.assertEqual(round(two_sec_funct.timed), 2)
+        
+    def test_check_permission_none(self):
+        me = {
+            'name': 'Gregory Steinhoff',
+            'permissions': []
+        }
+        
+        @check_permission('edit')
+        def edit_something(user):
+            output = user.get('name') + " is trying to edit something"
+            return output
+        with self.assertRaisesRegexp(PermissionError, 'Sorry, you do not have permission for this'):
+            edit_something(me)
+        
+        
+    def test_check_permission_edit(self):
+        me = {
+            'name': 'Gregory Steinhoff',
+            'permissions': ['edit', 'view', 'delete' ]
+        }
+        
+        @check_permission('edit')
+        def edit_something(user):
+            output = user.get('name') + " is trying to edit something"
+            return output
+        
+        self.assertEqual(edit_something(me), 'Gregory Steinhoff is trying to edit something')    
+        
+    def test_check_permission_delete(self):
+        me = {
+            'name': 'Gregory Steinhoff',
+            'permissions': ['edit', 'delete' ]
+        }
+        
+        @check_permission('delete')
+        def delete_something(user):
+            output = user.get('name') + " is trying to delete something"
+            return output
+        
+        self.assertEqual(delete_something(me), 'Gregory Steinhoff is trying to delete something')   
+            
