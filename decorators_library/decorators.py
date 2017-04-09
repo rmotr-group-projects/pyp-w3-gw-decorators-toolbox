@@ -7,7 +7,7 @@ import collections
 import time 
 import json
 
-from exceptions import TimeoutError, PermissionError
+from decorators_library.exceptions import TimeoutError, PermissionError
 
 def timeout(seconds, error_message = 'Function call timed out'):
     def decorate_it(funct):
