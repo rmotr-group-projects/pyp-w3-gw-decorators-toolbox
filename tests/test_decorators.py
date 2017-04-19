@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import time
 import unittest
+import logging
 from testfixtures import LogCapture
 
 from decorators_library.decorators import *
@@ -30,8 +31,8 @@ class DecoratorsTestCase(unittest.TestCase):
         with LogCapture() as capture:
             res = my_add(1, 2)
             capture.check(
-                ('tests.test_decorators', 'DEBUG', 'Executing "my_add" with params: (1, 2), {}'),
-                ('tests.test_decorators', 'DEBUG', 'Finished "my_add" execution with result: 3')
+                ('decorators_library.decorators', 'DEBUG', 'Executing "my_add" with params: (1, 2), {}'),
+                ('decorators_library.decorators', 'DEBUG', 'Finished "my_add" execution with result: 3')
             )
         self.assertEqual(res, 3)
 
@@ -100,3 +101,14 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+        
+        
+    def test_lowercaseArgs(self):
+        @lowercaseArguments
+        def importantFunction(*args):
+            return " ".join(args)
+            
+        self.assertEqual(importantFunction("This is", "Sparta!"), "this is sparta!")
+    
+            
+                
