@@ -14,14 +14,14 @@ class DecoratorsTestCase(unittest.TestCase):
         def very_slow_function():
             time.sleep(1)
         very_slow_function()
-
+    
     def test_timeout_raises(self):
         @timeout(1)
         def very_slow_function():
             time.sleep(2)
         with self.assertRaisesRegexp(TimeoutError, 'Function call timed out'):
             very_slow_function()
-
+    
     def test_debug_default_logger(self):
         @debug()
         def my_add(a, b):
