@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import time
 import unittest
+import logging
 from testfixtures import LogCapture
 
 from decorators_library.decorators import *
@@ -100,3 +101,18 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+        
+    def test_security_warning(self):
+        @insecure_object
+        def add(a, b):
+            return a + b
+            
+        with warnings.catch_warnings(record=True) as w:
+            # Cause all warnings to always be triggered.
+            warnings.simplefilter("always")
+            # Trigger a warning.
+            add(1, 2)
+            # Verify some things
+            assert len(w) == 1
+            assert issubclass(w[-1].category, DeprecationWarning)
+            assert "insecure" in str(w[-1].message)
