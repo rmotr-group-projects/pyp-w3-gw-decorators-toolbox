@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import time
 import unittest
+import logging
 from testfixtures import LogCapture
 
 from decorators_library.decorators import *
@@ -26,7 +27,7 @@ class DecoratorsTestCase(unittest.TestCase):
         @debug()
         def my_add(a, b):
             return a + b
-
+            
         with LogCapture() as capture:
             res = my_add(1, 2)
             capture.check(
