@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import time
 import unittest
+import os
 from testfixtures import LogCapture
+import  time
 
 from decorators_library.decorators import *
 from decorators_library.exceptions import *
@@ -100,3 +102,45 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+
+
+
+    def test_store_to_file(self):
+        @store_to_file()
+        def return_one():
+            return 1
+
+        return_one()
+        return_one()
+
+        with open('DataFolder/myData', 'rt') as fout:
+            data = fout.read()
+            data=data.split(" ")
+
+        import shutil
+        if os.path.exists('DataFolder'):
+            shutil.rmtree('DataFolder')
+
+        self.assertEqual(data, ['1', '1'])
+
+    def test_word_frequency(self):
+        @word_frequency('lorem')
+        def my_func():
+            return '''Lorem Ipsum is simply dummy text\
+             of the printing and typesetting industry. \
+             Lorem Ipsum has been the industry's standard \
+             dummy text ever since the 1500s, when an unknown \
+             printer took a galley of type and scrambled it \
+             to make a type specimen book. It has survived not \
+             only five centuries, but also the leap into
+             electronic typesetting, remaining essentially \
+             unchanged. It was popularised in the 1960s with \
+             the release of Letraset sheets containing Lorem \
+             Ipsum passages, and more recently with desktop \
+             publishing software like Aldus PageMaker including \
+             versions of Lorem Ipsum.'''
+
+        result = my_func()
+        string = 'The word lorem is found 4 times in the result of my_func function'
+
+        self.assertEqual(result, string)
