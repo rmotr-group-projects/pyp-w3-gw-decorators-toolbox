@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import time
 import unittest
+import re
 from testfixtures import LogCapture
-
 from decorators_library.decorators import *
 from decorators_library.exceptions import *
 
@@ -21,6 +21,7 @@ class DecoratorsTestCase(unittest.TestCase):
             time.sleep(2)
         with self.assertRaisesRegexp(TimeoutError, 'Function call timed out'):
             very_slow_function()
+
 
     def test_debug_default_logger(self):
         @debug()
@@ -100,3 +101,46 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+
+    def test_word_replace(self):
+        @WordReplace("cloud", "butt")
+        def word_counter(text):
+            count_dict = {}
+            text = re.sub(r'[\?\"\.]', '', text)
+            for word in text.split(" "):
+                if word in count_dict:
+                    count_dict[word] += count_dict[word]
+                    continue
+                count_dict[word] = 1
+            counter = 0
+            stats = "Here are the top 10 word count statisics\n\n"
+            for word, count in sorted(count_dict.items(),
+                                    key=lambda x: (x[1],x[0]),
+                                    reverse=True):
+                counter += 1
+                stats += "{}: {}\n".format(word, count)
+                if counter == 10:
+                    break
+            return stats
+
+        test_text = ("What is the cloud? Where is the cloud? Are we in the cloud now?"
+                     " These are all questions you've probably heard or even asked yourself."
+                     " The term \"cloud computing\" is everywhere.")
+        expected_results = ("Here are the top 10 word count statisics\n\nbutt: 8\nthe: 4\n"
+                            "is: 4\nyourself: 1\nyou've: 1\nwe: 1\nterm: 1\nquestions: 1\n"
+                            "probably: 1\nor: 1\n") 
+        results = word_counter(test_text)
+        self.assertEqual(results, expected_results)
+        
+        
+    def test_retry(self):       
+        @retry
+        def connection(x):
+            calls.append(x)
+            if x == 3:
+                return True
+            return False
+        calls = []
+        for i in range(1,4):
+            test = connection(i)
+        self.assertEqual(calls, [1, 1, 1, 2, 2, 2, 3])
