@@ -100,3 +100,54 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+
+    def test_retry(self):
+        num_tries = {'a': 0}
+
+        @retry(4)
+        def dumb_fail():
+            if num_tries['a'] == 3:
+                return 1
+            else:
+                num_tries['a'] += 1
+                raise TypeError
+
+        @retry(2)
+        def dumb_fail1():
+            if num_tries['a'] == 3:
+                return 1
+            else:
+                num_tries['a'] += 1
+                raise TypeError        
+        
+        
+        self.assertEqual(dumb_fail(), 1)
+        num_tries['a'] = 0
+        with self.assertRaisesRegexp(TimeoutError, 'Too many tries'):
+            dumb_fail1()
+            
+            
+    def test_timer(self):
+        @timer
+        def test_sleep():
+            time.sleep(1)
+            return 1
+
+        with LogCapture() as capture:
+            res = test_sleep()
+            capture.check(
+                ('tests.test_decorators', 'DEBUG', 'It took test_sleep 1.00 seconds to run.'),
+            )
+        self.assertEqual(res, 1)
+    
+    def test_clipper(self):
+        @clipper(100)
+        def big_function():
+            return 150
+            
+        @clipper(100)
+        def med_function():
+            return 80
+            
+        self.assertEqual(big_function(), 100)
+        self.assertEqual(med_function(), 80)
