@@ -2,9 +2,7 @@
 import time
 import unittest
 from testfixtures import LogCapture
-
-from decorators_library.decorators import *
-from decorators_library.exceptions import *
+from decorators_library import *
 
 
 class DecoratorsTestCase(unittest.TestCase):
@@ -88,6 +86,17 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(count_calls.counters(), {'my_func': 0})
         count_calls.reset_counters()
 
+    def test_func_stopwatch(self):
+        @func_stopwatch
+        def add(a, b):
+            return a + b
+        
+        add(1, 1)
+        add(2, 3)
+        self.assertEqual(func_stopwatch.count, 2)
+        func_stopwatch.reset()
+        self.assertEqual(func_stopwatch.count, 0)
+
     def test_memoized(self):
         @memoized
         def add(a, b):
@@ -100,3 +109,19 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+        
+        
+    def test_retry_no_exception_raised(self):
+        @retry(3)
+        @timeout(2)
+        def very_slow_function():
+            time.sleep(1)
+        very_slow_function()
+
+    def test_retry_timeout_exception_raised(self):
+        @retry(3)
+        @timeout(1)
+        def very_slow_function():
+            time.sleep(2)
+        with self.assertRaisesRegexp(TimeoutError, 'Function call timed out'):
+            very_slow_function()
