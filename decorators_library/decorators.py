@@ -145,7 +145,7 @@ class count_calls(object):
         
 '''
 Decorator function 'func_stopwatch' calculates and logs the total runtime of any decorated function.
-func_stopwatch creates entries 
+func_stopwatch has a reset function that destroys the log file.
 
     returns the result of executing 'orig_func'
     
@@ -173,7 +173,7 @@ class func_stopwatch(object):
                     logf.close()
             except:
                  with open('log.txt', 'w+') as logf:
-                    logf.write("[Began: {}]\nEnding function {} with params: {}, {}\nTotal runtime:{}\nreturned:\n   Type: {}\n   Value: {}\n\n".format(t1, orig_func.__name__, args, kw, runtime, type(res), res))
+                    logf.write("[Began: {}]\nEnding function {} with params: {}, {}\nTotal runtime:{}\nreturned:\n   Type: {}\n   Value: {}\n\n".format(t1, self.orig_func.__name__, args, kw, runtime, type(res), res))
                     logf.close()
             return res
             
@@ -260,7 +260,7 @@ def retry(max_attempts, delay = 1, delay_factor = 2, exceptions = (Exception,)):
                         time.sleep(wrapper_delay)
                         wrapper_delay = wrapper_delay * delay_factor
                     else:
-                        raise
+                        raise 
                 else:
                     break
             return wrapper

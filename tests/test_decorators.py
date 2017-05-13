@@ -87,7 +87,7 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(count_calls.counters(), {'my_func': 0})
         count_calls.reset_counters()
 
-    def test_func_stopwatch(self):
+    def test_func_stopwatch_clean(self):
         @func_stopwatch
         def add(a, b):
             return a + b
