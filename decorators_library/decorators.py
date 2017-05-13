@@ -2,7 +2,7 @@
 import time 
 import signal
 import logging
-from decorators_libary.exceptions import *
+from . import exceptions
 
 """
 @debug()
@@ -169,7 +169,7 @@ class func_stopwatch(object):
             runtime = time.time() - t1
             try:
                 with open('log.txt', 'a') as logf:
-                    logf.write("ENTRY #{}\nStart time: {}\nCompleted execution of function {} with params: {}, {}\nTotal runtime:{}\nreturned:\n   Type: {}\n   Value: {}\n\n".format(func_stopwatch.count, t1, orig_func.__name__, args, kw, runtime, type(res), res))
+                    logf.write("ENTRY #{}\nStart time: {}\nCompleted execution of function {} with params: {}, {}\nTotal runtime:{}\nreturned:\n   Type: {}\n   Value: {}\n\n".format(func_stopwatch.count, t1, self.orig_func.__name__, args, kw, runtime, type(res), res))
                     logf.close()
             except:
                  with open('log.txt', 'w+') as logf:
@@ -177,6 +177,7 @@ class func_stopwatch(object):
                     logf.close()
             return res
             
+        func_stopwatch.count += 1
         return wrapper
     
     @classmethod
