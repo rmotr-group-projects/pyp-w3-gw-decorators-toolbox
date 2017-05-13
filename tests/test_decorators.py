@@ -102,29 +102,27 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
 
     def test_retry(self):
-        num_tries = 0
+        num_tries = {'a': 0}
 
         @retry(4)
         def dumb_fail():
-            nonlocal num_tries
-            if num_tries == 3:
+            if num_tries['a'] == 3:
                 return 1
             else:
-                num_tries += 1
+                num_tries['a'] += 1
                 raise TypeError
 
         @retry(2)
         def dumb_fail1():
-            nonlocal num_tries
-            if num_tries == 3:
+            if num_tries['a'] == 3:
                 return 1
             else:
-                num_tries += 1
+                num_tries['a'] += 1
                 raise TypeError        
         
         
         self.assertEqual(dumb_fail(), 1)
-        num_tries = 0
+        num_tries['a'] = 0
         with self.assertRaisesRegexp(TimeoutError, 'Too many tries'):
             dumb_fail1()
             

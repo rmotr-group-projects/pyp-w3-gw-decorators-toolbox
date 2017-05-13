@@ -92,17 +92,15 @@ def timer(f):
 
 def retry(limit):
     def retry_decorated(f):
-        count = 0
+        count = {'a': 0}
         def wrapper(*args, **kwargs):
-            nonlocal count
-            if count < limit:
+            if count['a'] < limit:
                 try:
                     return f(*args, **kwargs)
                 except:
-                    count += 1
+                    count['a'] += 1
                     return wrapper(*args, **kwargs)
             raise TimeoutError("Too many tries")
-                
         return wrapper
     return retry_decorated
     
@@ -118,27 +116,3 @@ def clipper(limit):
     return clipper_decorated
                 
 
-
-"""    
-@timer
-def foo():
-    time.sleep(1)
-    print("hello")
-    
-foo()
-"""
-
-"""
-num_tries = 0
-
-@retry(2)
-def dumb_fail():
-    global num_tries
-    if num_tries == 3:
-        print("Success!")
-    else:
-        num_tries += 1
-        raise TypeError
-    
-dumb_fail()
-"""
