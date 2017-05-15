@@ -2,14 +2,8 @@
 import time 
 import signal
 import logging
-from . import exceptions
+from .exceptions import *
 
-"""
-@debug()
-logging.getLogger(f.__module__)
-@debug('my cool logger')
-logging.getLogger('my cool logger')
-"""
 
 class debug(object):
     def __init__(self, logger=None):
@@ -28,12 +22,6 @@ class debug(object):
         return wraps
         
 
-"""        
-my_logger = logging.getLogger(f.__module__)
-my_logger.error('Cool log entry bro.')
-('decorators_libary.decorators', 'ERROR', 'Cool log entry bro.')
-"""
-
 class memoized(object):
     def __init__(self, func):
         self.func = func
@@ -46,36 +34,6 @@ class memoized(object):
         else:
             self.cache[args] = self.func(*args)
             return self.cache[args]
-"""
-def my_dec(f): # Block 1
-    def wrap(*args): # Block 2
-        return f(*args)
-    return wrap'''
-    
-class my_dec(object):
-    def __init__(self, f): # Block 1
-        self.f = f
-    def __call__(self, *args): # Block 2
-        return self.f(*args)
-        
-def my_dec_with_param(param): # Block 1
-    def deco(f): # Block 2
-        def wrap(*args): # Block 3
-            return f(*args)
-        return wrap
-    return deco
-    
-class my_dec_with_param(object):
-    def __init__(self, param): # Block 1
-        self.param = param
-    def __call__(self, f): # Block 2
-        def wrap(*args): # Block 3
-            return f(*args)
-        return wrap
-
-my_func = my_dec(f) wrap(f)(args) # function
-my_func = my_dec(f) my_dec_instance(args) # class
-"""
 
 
 def timeout(sMax):
@@ -95,26 +53,6 @@ def timeout(sMax):
         return wrapper
     return real_dec    
                 
-"""                
-signal.signal(signal_to_wait_for, function_to_call_when_signal_raised)
-signal.alarm(timeout) # Sends signal.SIGALRM after timeout seconds
-signal.alarm(0) # clears alarm
-"""
-"""
-@count_calls
-def my_func(x, y):
-    pass
-
-@count_calls
-def my_other_func(x, y):
-    pass
-
-my_func()
-my_other_func()
-
-count_calls.counts()
-{'my_func': 1, 'my_other_func': 1}
-"""
 
 class count_calls(object):
 
@@ -188,55 +126,6 @@ class func_stopwatch(object):
             print('log.txt deleted.')
         except:
             print('No log file found to delete.')
-    
-    
-    
-"""
-@count_calls
-def my_func(*args):
-    return sum(args)
-
-count_calls.counters() >> {'my_func': 0}
-{}
-
-my_func = count_calls(my_func) >> count_calls_instance with self.func == my_func
-
-my_func(1,2,3) >> 6
-my_func.counter() >> 1
-
-
-        
-class my_class(object):
-    my_var = 'Stuff'
-    def __init__():
-        self.class_variable
-    
-    def my_meth(self):
-        return self
-    
-    @classmethod
-    @property
-    def my_prop(self):
-        
-        return 'Im a property'
-        
-    @classmethod
-    def my_cls(cls):
-        return cls.my_var
-        
-    @staticmethod
-    def my_stat():
-        return 'Hi'
-    
-class Person(object):
-    def __init__(self, first_name, last_name):
-        self.first_name = first_name
-        self.last_name = last_name
-        
-    @property
-    def full_name(self):
-        return self.first_name + " " + self.last_name
-"""
 
 
 def retry(max_attempts, delay = 1, delay_factor = 2, exceptions = (Exception,)):
@@ -263,5 +152,5 @@ def retry(max_attempts, delay = 1, delay_factor = 2, exceptions = (Exception,)):
                         raise 
                 else:
                     break
-            return wrapper
-        return retry_dec
+        return wrapper
+    return retry_dec
