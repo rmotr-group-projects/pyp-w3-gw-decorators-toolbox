@@ -140,7 +140,7 @@ def retry(max_attempts, delay = 1, delay_factor = 2, exceptions = (Exception,)):
         def wrapper(*args, **kwargs):
             wrapper_delay = delay
             attempts = range(max_attempts)
-            attempts.reverse()
+            reversed(attempts)
             for attempts_left in attempts:
                 try:
                    return func(*args, **kwargs)
