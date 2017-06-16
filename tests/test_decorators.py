@@ -18,9 +18,12 @@ class DecoratorsTestCase(unittest.TestCase):
     def test_timeout_raises(self):
         @timeout(1)
         def very_slow_function():
-            time.sleep(2)
+            time.sleep(3)
+        before = time.time()
         with self.assertRaisesRegexp(TimeoutError, 'Function call timed out'):
             very_slow_function()
+        after = time.time()
+        self.assertTrue(after - before < 3, "Function allowed to execute past timeout.")
 
     def test_debug_default_logger(self):
         @debug()
@@ -100,3 +103,15 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+
+    def test_memoized_using_cached_values(self):
+    	@memoized
+    	def slow_add(a, b):
+    		time.sleep(3)
+    		return a + b
+
+    	self.assertEqual(slow_add(1, 2), 3)
+    	before = time.time()
+    	self.assertEqual(slow_add(1, 2), 3)
+    	after = time.time()
+    	self.assertTrue(after - before < 3, "Not using cached value.")
