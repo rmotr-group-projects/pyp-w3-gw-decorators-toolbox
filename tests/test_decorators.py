@@ -100,3 +100,28 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+
+
+    def test_timelastran(self):
+        @timelastran
+        def my_func():
+           pass
+        my_func()
+        currenttime = time.strftime(("%Y-%m-%d %H:%M:%S"))
+        self.assertEqual(my_func.lasttime(), currenttime)
+        my_func()
+        currenttime = time.strftime(("%Y-%m-%d %H:%M:%S"))
+        self.assertEqual(my_func.lasttime(), currenttime)
+        
+        
+    def test_time_test(self):
+        @funtimer
+        def my_func():
+            pass
+        my_func()
+        with LogCapture() as capture:
+            res = my_func()
+            capture.check(
+                ('tests.test_decorators', 'DEBUG', 'Function took 1 to run'),
+                )       
+        
