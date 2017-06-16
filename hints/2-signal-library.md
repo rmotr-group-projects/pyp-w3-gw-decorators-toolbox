@@ -1,6 +1,7 @@
 # Hint 2 - Timeout
 
-The timeout decorator always causes troubles because it's "complicated" to implement. Here's an example for you to check:
+The timeout decorator always causes troubles because it's "complicated" to implement. 
+Here's an example for you to check:
 
 ```python
 import signal
