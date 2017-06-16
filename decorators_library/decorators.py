@@ -107,8 +107,9 @@ def funtimer(f):
         result = f(*args,**kwargs)
         end_time = time.time()
         runtime = math.ceil(end_time - start_time)
+        a = int(runtime)
         logger = logging.getLogger(f.__module__)
-        logger.debug('Function took {} to run'.format(runtime))
+        logger.debug('Function took {} to run'.format(a))
         return result
     return innerfunction
     

@@ -122,6 +122,6 @@ class DecoratorsTestCase(unittest.TestCase):
         with LogCapture() as capture:
             res = my_func()
             capture.check(
-                ('tests.test_decorators', 'DEBUG', 'Function took 1.0 to run'),
+                ('tests.test_decorators', 'DEBUG', 'Function took 1 to run'),
                 )       
         
