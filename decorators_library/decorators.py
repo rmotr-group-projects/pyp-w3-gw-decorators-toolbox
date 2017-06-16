@@ -1,7 +1,7 @@
 # implement your decorators here.
 import logging
 import signal
-from exceptions import TimeoutError
+from .exceptions import TimeoutError
 
 
 class memoized(object):
