@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import time
 import unittest
+from unittest.mock import patch
 from testfixtures import LogCapture
 
 from decorators_library.decorators import *
@@ -18,9 +19,12 @@ class DecoratorsTestCase(unittest.TestCase):
     def test_timeout_raises(self):
         @timeout(1)
         def very_slow_function():
-            time.sleep(2)
+            time.sleep(3)
+        before = time.time()
         with self.assertRaisesRegexp(TimeoutError, 'Function call timed out'):
             very_slow_function()
+        after = time.time()
+        self.assertTrue(after - before < 3, "Function allowed to execute past timeout.")
 
     def test_debug_default_logger(self):
         @debug()
@@ -100,3 +104,5 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
+        with patch.dict(add.cache, {(1, 2): 6}):
+            self.assertEqual(add(1, 2), 6, "Not using cached value")
