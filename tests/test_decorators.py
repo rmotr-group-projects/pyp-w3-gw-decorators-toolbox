@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import time
 import unittest
+from unittest.mock import patch
 from testfixtures import LogCapture
 
 from decorators_library.decorators import *
@@ -103,15 +104,5 @@ class DecoratorsTestCase(unittest.TestCase):
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5})
         self.assertEqual(add(3, 4), 7)
         self.assertEqual(add.cache, {(1, 2): 3, (2, 3): 5, (3, 4): 7})
-
-    def test_memoized_using_cached_values(self):
-    	@memoized
-    	def slow_add(a, b):
-    		time.sleep(3)
-    		return a + b
-
-    	self.assertEqual(slow_add(1, 2), 3)
-    	before = time.time()
-    	self.assertEqual(slow_add(1, 2), 3)
-    	after = time.time()
-    	self.assertTrue(after - before < 3, "Not using cached value.")
+        with patch.dict(add.cache, {(1, 2): 6}):
+            self.assertEqual(add(1, 2), 6, "Not using cached value")
