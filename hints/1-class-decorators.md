@@ -1,6 +1,6 @@
 # Hint 1 - Decorator that receives arguments
 
-`timeout`, `debug` are both decorators that receive arguments. An easy way to implement that with Python is through a _"Class Decorator"_. Example related to yesterday's class:
+`timeout`, `debug` are both decorators that receive arguments. An easy way to implement that with Python is through a _"Class Decorator"_. Example:
 
 ```python
 class only_num_arguments(object):
