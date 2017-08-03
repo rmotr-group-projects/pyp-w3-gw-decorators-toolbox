@@ -8,6 +8,18 @@ We provide an initial set of decorators you must implement, with all their prope
 
 This is the initial set of decorators you must implement:
 
+### `inspect` decorator
+
+The `inspect` decorator is simple. It just intercepts every call to the function and prints it out to the screen. Yes, a regular `print` statement. Example:
+
+```python
+@inspect
+def my_add(a, b):
+    return a + b
+
+my_add(3, 5)  # 8
+# Printed: "my_add invoked with 3, 5. Result: 8"
+```
 
 ### `timeout` decorator
 
