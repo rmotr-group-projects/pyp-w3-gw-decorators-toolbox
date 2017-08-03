@@ -1,5 +1,6 @@
-pytest==2.9.1
-pytest-cov==2.2.1
-coverage==4.0.3
-tox==2.3.1
-testfixtures==4.10.0
+coverage==4.4.1
+pytest==3.2.0
+pytest-cov==2.5.1
+testfixtures==5.1.1
+tox==2.7.0
+mock==2.0.0

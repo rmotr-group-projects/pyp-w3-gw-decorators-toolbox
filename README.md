@@ -19,7 +19,22 @@ def very_slow_function():
     time.sleep(2)
 
 >>> very_slow_function()
-TimeoutError: Function call timed out
+FunctionTimeoutException: Function call timed out
+```
+
+The `timeout` decorator accepts an additional (optional) parameter with the exception to raise. By default, a `FunctionTimeoutException` should be raised. But it can be customized when the function is decorated. Example:
+
+```python
+class MyVeryCoolException(Exception):
+  pass
+
+@timeout(1, exception=MyVeryCoolException)
+def very_slow_function():
+    time.sleep(2)
+
+>>> very_slow_function()
+MyVeryCoolException: Function call timed out
+# ☝️ Please note the exception raised
 ```
 
 ### `debug` decorator
