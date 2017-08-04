@@ -28,7 +28,8 @@ def inspect(fn):
             argstrng += '.'
                 
         result = fn(*args, **kwargs)
-        print "%s invoked with %s Result: %s" % (op, argstrng, result)
+        print(op+" invoked with "+argstrng+" Result: "+str(result))
+        # print "%s invoked with %s Result: %s" % (op, argstrng, result)
         return fn(*args, **kwargs)
     return operation
     
