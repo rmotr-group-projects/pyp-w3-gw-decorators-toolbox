@@ -28,7 +28,7 @@ def inspect(fn):
             argstrng += '.'
                 
         result = fn(*args, **kwargs)
-        print "{} invoked with {} Result: {}".format(op, argstrng, result)
+        print "%s invoked with %s Result: %s" % (op, argstrng, result)
         return fn(*args, **kwargs)
     return operation
     
