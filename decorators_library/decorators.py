@@ -1,7 +1,7 @@
 # implement your decorators here.
 import signal
 import time
-from exceptions import FunctionTimeoutException
+from .exceptions import FunctionTimeoutException
 
 def inspect(fn):
     def operation(*args, **kwargs):
