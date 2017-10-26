@@ -1,6 +1,7 @@
 from functools import wraps
 from decorators_library.exceptions import FunctionTimeoutException
 import signal
+import logging
 
 
 def inspect(fn):
@@ -32,8 +33,8 @@ class timeout(object):
         return wrapped
 
 class debug(object):
-  def __init__(self):
-    pass
+  def __init__(self, logger=logging.getLogger('tests.test_decorators')):
+    self.logger = logger
   
   def __call__(self, fn):
     @wraps(fn)
@@ -41,9 +42,9 @@ class debug(object):
       kwarg_lst = ', '.join(['{}={}'.format(key, val) for key, val in kwargs.items()])
       arg_str = ', '.join(map(str,args))
         
-      print('Executing "{}" with params: ({}), {{{}}}'.format(fn.__name__, arg_str, kwarg_lst))
+      self.logger.debug('Executing "{}" with params: ({}), {{{}}}'.format(fn.__name__, arg_str, kwarg_lst))
       fn_result = fn(*args, **kwargs)
-      print('Finished "{}" execution with result: {}'.format(fn.__name__, str(fn_result)))
+      self.logger.debug('Finished "{}" execution with result: {}'.format(fn.__name__, str(fn_result)))
       return fn_result
     return new_fn
 
