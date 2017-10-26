@@ -46,9 +46,40 @@ class debug(object):
       return fn_result
     return new_fn
 
-def count_calls():
-    pass
+class count_calls(object):
+  FN_CALLS = {}
+  
+  def __init__(self, fn):
+    self.fn = fn
+    self.FN_CALLS[self.fn.__name__] = 0
+  
+  def __call__(self, *args, **kwargs):
+    self.FN_CALLS[self.fn.__name__] += 1
+    return self.fn(*args, **kwargs)
+  
+  def counter(self):
+    return self.FN_CALLS[self.fn.__name__]
+  
+  @classmethod
+  def counters(cls):
+    return cls.FN_CALLS
+  
+  @classmethod
+  def reset_counters(cls):
+    cls.FN_CALLS = {}
     
 
 def memoized(fn):
-    pass
+  cache = {}
+  
+  @wraps(fn)
+  def new_fn(*args, **kwargs):
+    if tuple(args) in cache:
+      return cache[tuple(args)]
+    else:
+      fn_result = fn(*args, **kwargs)
+      cache[tuple(args)] = fn_result
+      return fn_result
+  
+  new_fn.cache = cache
+  return new_fn
