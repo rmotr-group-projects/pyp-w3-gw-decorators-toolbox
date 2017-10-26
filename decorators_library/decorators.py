@@ -7,9 +7,10 @@ def inspect(fn):
     def new_fn(*args, **kwargs):
         kwarg_lst = tuple('{}={}'.format(key, val) for key, val in kwargs.items())
         arg_str = ', '.join(map(str,args  + kwarg_lst))
+        fn_result = fn(*args, **kwargs)
         
-        print('{} invoked with {}. Result: {}'.format(fn.__name__, arg_str, str(fn(*args, **kwargs))))
-        return fn(*args, **kwargs)
+        print('{} invoked with {}. Result: {}'.format(fn.__name__, arg_str, str(fn_result)))
+        return fn_result
     return new_fn
 
 class timeout(object):
@@ -21,17 +22,33 @@ class timeout(object):
         raise self.exception("Function call timed out")
 
     def __call__(self, fn):
+        @wraps(fn)
         def wrapped(*args, **kwargs):
             signal.signal(signal.SIGALRM, self.raise_alarm)
             signal.alarm(self.duration)
             return fn(*args, **kwargs)
+        signal.alarm(0)
         return wrapped
 
-def debug(fn):
+class debug(object):
+  def __init__(self):
     pass
+  
+  def __call__(self, fn):
+    @wraps(fn)
+    def new_fn(*args, **kwargs):
+      kwarg_lst = ', '.join(['{}={}'.format(key, val) for key, val in kwargs.items()])
+      arg_str = ', '.join(map(str,args))
+        
+      print('Executing "{}" with params: ({}), {{{}}}'.format(fn.__name__, arg_str, kwarg_lst))
+      fn_result = fn(*args, **kwargs)
+      print('Finished "{}" execution with result: {}'.format(fn.__name__, fn_result))
+      return fn_result
+    return new_fn
 
-def count_calls(fn):
+def count_calls():
     pass
+    
 
 def memoized(fn):
     pass
