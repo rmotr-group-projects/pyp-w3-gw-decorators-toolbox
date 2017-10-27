@@ -1,17 +1,16 @@
 import signal
 
-class FunctionTimeoutException(Exception):
-    pass
+from .exceptions import FunctionTimeoutException
 
 # implement your decorators here.
 def inspect(fn):
-    def new_add(a, b, **kwargs):
-        result = fn(a, b, **kwargs)
+    def new_add(*args, **kwargs):
+        result = fn(*args, **kwargs)
         if not kwargs or kwargs['operation'] == 'add':
             extra_text = ''
         else:
             extra_text = ', operation={}'.format(kwargs['operation'])
-        print('{} invoked with {}, {}{}. Result: {}'.format(fn.__name__,a,b,extra_text,result))
+        print('{} invoked with {}, {}{}. Result: {}'.format(fn.__name__,args[0],args[1],extra_text,result))
         return result
     return new_add
     
@@ -32,9 +31,19 @@ class timeout(object):
             return result
         return new_fn
 
-def memoized():
-    pass
-
+class memoized(object):
+    def __init__(self, fn):
+        self.cache = {}
+        self.fn = fn
+        
+    def __call__(self, *args):
+        if not self.cache.get(args):
+            result = self.fn(*args)
+            self.cache[(args)] = result
+            return result
+        else:
+            return self.cache.get(args)    
+ 
 class count_calls(object):
     glob_count = {}
     
