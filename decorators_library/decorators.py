@@ -50,11 +50,11 @@ class count_calls(object):
     def __init__(self, fn):
         self.ind_count = 0
         self.fn = fn
-        if not self.glob_count.get(self.fn.__name__):
-            self.glob_count[self.fn.__name__] = 0
+        if not type(self).glob_count.get(self.fn.__name__):
+            type(self).glob_count[self.fn.__name__] = 0
         
     def __call__(self):
-        self.glob_count[self.fn.__name__] += 1
+        type(self).glob_count[self.fn.__name__] += 1
         self.ind_count += 1
         return self.fn()
     
