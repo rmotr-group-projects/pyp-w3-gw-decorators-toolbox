@@ -1,10 +1,9 @@
-# implement your decorators here.
 def inspect(func):
-   
-  def func_wrapper(*args):
-    print ("my_add invoked with {}. Result: {}".format(str(args)[1:-1],func(*args)))
+  def func_wrapper(*args, **kwargs):
+    kwargs_str = ""
+    for kw in kwargs.keys():
+           kwargs_str = ", " + ( kw+'='+str( kwargs[kw] ) )
+    arg_str = str(args)[1:-1] + kwargs_str
+    print ("{} invoked with {}. Result: {}".format(func.__name__, arg_str, func(*args,**kwargs)))
+    return func(*args,**kwargs)
   return func_wrapper  
-  
-@inspect
-def my_add(a, b):
-    return a + b
