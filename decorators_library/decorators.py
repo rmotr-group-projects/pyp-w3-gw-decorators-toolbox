@@ -41,10 +41,15 @@ def timeout(fn):
 
 
 class memoized(object):
+    cache = {}
     def __init__(self, fn):
         self.fn = fn
-        self.cache = {}
-    
-    def __call__(self):
-        
-    
+
+    def __call__(self, *args, **kwargs):
+        def cach_check(*args, **kwargs):
+            try:
+                return memoized.cache[args]
+            except:
+                memoized.cache[args] = self.fn(*args, **kwargs)
+                return memoized.cache[args]
+        return cach_check(*args, **kwargs)
