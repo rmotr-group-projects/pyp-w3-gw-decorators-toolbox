@@ -44,14 +44,16 @@ class timeout(object):
         self.max_time = max_time
         self.exception = exception
 
-    def call_exception(self):
+    def call_exception(self, signum, stack):
         raise self.exception('Function call timed out')
 
     def __call__(self, fn):
         def new_fn(*args, **kwargs):
-            signal.signal(signal.SIGALRM, self.call_exception())
+            signal.signal(signal.SIGALRM, self.call_exception)
             signal.alarm(self.max_time)
-            return fn(*args, **kwargs)
+            result = fn(*args, **kwargs)
+            signal.alarm(0)
+            return result
         return new_fn
         
 
@@ -69,3 +71,7 @@ class memoized(object):
                 self.cache[args] = self.fn(*args, **kwargs)
                 return self.cache[args]
         return cach_check(*args, **kwargs)
+
+
+class debug(object):
+    pass
