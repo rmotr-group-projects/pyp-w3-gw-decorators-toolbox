@@ -78,7 +78,7 @@ class memoized(object):
 
 class debug(object):
 
-    def __init__(self, logger= None):
+    def __init__(self, logger=None):
         if not logger:
             logging.basicConfig()
             self.logger = logging.getLogger('tests.test_decorators')
@@ -88,9 +88,10 @@ class debug(object):
 
     def __call__(self, fn):
         def new_fn(*args, **kwargs):
-            self.logger.log(10,'Executing "%s" with params: %s, %s',fn.__name__, args, kwargs)
+            self.logger.log(10, 'Executing "%s" with params: %s, %s',
+                            fn.__name__, args, kwargs)
             result = fn(*args, **kwargs)
-            self.logger.log(10,'Finished "{}" execution with result: {}'.format(
-                   fn.__name__,result))
+            self.logger.log(10, 'Finished "{}" execution with result: {}'
+                            .format(fn.__name__, result))
             return result
         return new_fn
