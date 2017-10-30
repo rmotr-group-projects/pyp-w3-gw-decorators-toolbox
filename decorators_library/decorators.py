@@ -1,8 +1,10 @@
 import signal
-import time
+import logging
 from .exceptions import *
-# implement your decorators here.
+
+
 def inspect(fn):
+
     def new_fn(*args, **kwargs):
         arg_list = []
         result = fn(*args, **kwargs)
@@ -40,7 +42,8 @@ class count_calls(object):
 
 
 class timeout(object):
-    def __init__(self, max_time, exception = FunctionTimeoutException):
+
+    def __init__(self, max_time, exception=FunctionTimeoutException):
         self.max_time = max_time
         self.exception = exception
 
@@ -55,10 +58,10 @@ class timeout(object):
             signal.alarm(0)
             return result
         return new_fn
-        
+
 
 class memoized(object):
-    
+
     def __init__(self, fn):
         self.fn = fn
         self.cache = {}
@@ -74,4 +77,20 @@ class memoized(object):
 
 
 class debug(object):
-    pass
+
+    def __init__(self, logger= None):
+        if not logger:
+            logging.basicConfig()
+            self.logger = logging.getLogger('tests.test_decorators')
+            self.logger.setLevel(logging.DEBUG)
+        else:
+            self.logger = logger
+
+    def __call__(self, fn):
+        def new_fn(*args, **kwargs):
+            self.logger.log(10,'Executing "%s" with params: %s, %s',fn.__name__, args, kwargs)
+            result = fn(*args, **kwargs)
+            self.logger.log(10,'Finished "{}" execution with result: {}'.format(
+                   fn.__name__,result))
+            return result
+        return new_fn
