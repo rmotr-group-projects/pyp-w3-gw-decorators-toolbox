@@ -1,3 +1,6 @@
+import signal
+import time
+from .exceptions import *
 # implement your decorators here.
 def inspect(fn):
     def new_fn(*args, **kwargs):
@@ -36,9 +39,21 @@ class count_calls(object):
         return cls.counter_cache
 
 
-def timeout(fn):
-    pass
+class timeout(object):
+    def __init__(self, max_time, exception = FunctionTimeoutException):
+        self.max_time = max_time
+        self.exception = exception
 
+    def call_exception(self):
+        raise self.exception('Function call timed out')
+
+    def __call__(self, fn):
+        def new_fn(*args, **kwargs):
+            signal.signal(signal.SIGALRM, self.call_exception())
+            signal.alarm(self.max_time)
+            return fn(*args, **kwargs)
+        return new_fn
+        
 
 class memoized(object):
     
