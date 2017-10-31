@@ -41,3 +41,27 @@ class timeout(object):
       signal.alarm(0)
       return result
     return new_fn    
+    
+class count_calls(object):
+    total_count = {}
+
+    def __init__(self, func):
+        self.func = func
+        self.total_count[self.func.__name__] = 0
+
+    def __call__(self, *args, **kwargs):
+        print(self.total_count[self.func.__name__])
+        self.total_count[self.func.__name__] += 1
+        return self.func(*args, **kwargs)
+
+
+    def counter(self):
+        return self.total_count[self.func.__name__]
+
+    @classmethod
+    def counters(cls):
+        return cls.total_count
+
+    @classmethod
+    def reset_counters(cls):
+        cls.total_count = {}    
