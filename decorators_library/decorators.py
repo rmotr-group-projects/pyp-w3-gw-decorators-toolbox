@@ -1,3 +1,6 @@
+import signal
+from exceptions import FunctionTimeoutException
+
 def inspect(func):
   def func_wrapper(*args, **kwargs):
     kwargs_str = ""
@@ -21,3 +24,20 @@ class memoized(object):
     self.cache[args] = result
     return result
     return self.cache.keys(args)
+    
+class timeout(object):
+  def __init__(self, time, exception=FunctionTimeoutException):
+    self.time = time
+    self.exception = exception
+
+  def receive_alarm(self, signum, stack):
+    raise self.exception('Function call timed out')
+
+  def __call__(self, func):
+    def new_fn(*args, **kwargs):
+      signal.signal(signal.SIGALRM, self.receive_alarm)
+      signal.alarm(self.time)
+      result = func(*args, **kwargs)
+      signal.alarm(0)
+      return result
+    return new_fn    
