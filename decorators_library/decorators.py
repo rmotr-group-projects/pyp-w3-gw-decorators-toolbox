@@ -1,5 +1,5 @@
 import signal
-from exceptions import FunctionTimeoutException
+from .exceptions import FunctionTimeoutException
 
 def inspect(func):
   def func_wrapper(*args, **kwargs):
