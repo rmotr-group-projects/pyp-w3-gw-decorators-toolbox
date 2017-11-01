@@ -202,7 +202,10 @@ class AuditorDecoratorTestCase(unittest.TestCase):
         @auditor()
         def add(a, b):
             return a+b
-        os.remove("auditor.csv")
+        try:
+            os.remove("auditor.csv")
+        except OSError:
+            pass
         ret1 = add(3, 4)
         audit_file = 'auditor.csv'
         self.assertTrue(os.path.isfile(audit_file))
