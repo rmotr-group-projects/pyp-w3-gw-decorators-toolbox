@@ -37,7 +37,7 @@ class timeout(object):
         return wrapped
 
 class debug(object):
-    def __init__(self, logger=logging.getLogger('tests.test_decorators')):
+    def __init__(self, logger=None):
         self.logger = logger
   
     def __call__(self, fn):
@@ -46,6 +46,10 @@ class debug(object):
             # Convert kwargs & args into strings for logging
             kwarg_lst = ', '.join(['{}={}'.format(key, val) for key, val in kwargs.items()])
             arg_str = ', '.join(map(str,args))
+            
+            # If logger isn't set yet do that
+            if not self.logger:
+                self.logger = logging.getLogger('tests.test_decorators')
             
             # First log parameters being used
             self.logger.debug('Executing "{}" with params: ({}), {{{}}}'.format(fn.__name__, arg_str, kwarg_lst))
