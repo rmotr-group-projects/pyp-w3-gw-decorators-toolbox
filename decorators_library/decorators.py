@@ -13,7 +13,6 @@ class count_calls(object):
 
     def __init__(self, fn):
         self.fn = fn
-        self.count = 0
         count_calls.function_counts[self.fn.__name__] = 0
 
     def __call__(self, *args, **kwargs):
