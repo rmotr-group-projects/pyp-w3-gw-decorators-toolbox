@@ -64,7 +64,8 @@ class count_calls(object):
     def __call__(self, *args, **kwargs):
         next(self)
         return self.function(*args, **kwargs)
-        
+    
+    next = __next__ 
 
 class memoized(object):
     def __init__(self, function):
