@@ -7,8 +7,32 @@ def memoized():
     pass
 
 
-def count_calls():
-    pass
+class count_calls(object):
+
+    function_counts = {}
+
+    def __init__(self, fn):
+        self.fn = fn
+        self.count = 0
+        count_calls.function_counts[self.fn.__name__] = 0
+
+    def __call__(self, *args, **kwargs):
+        self.increment_counter()
+        return self.fn(*args, **kwargs)
+
+    def increment_counter(self):
+        count_calls.function_counts[self.fn.__name__] += 1
+
+    def counter(self):
+        return count_calls.function_counts[self.fn.__name__]
+
+    @classmethod
+    def counters(cls):
+        return count_calls.function_counts
+
+    @classmethod
+    def reset_counters(cls):
+        cls.function_counts = {}
 
 
 def inspect(fn):
