@@ -13,8 +13,8 @@ from mock import patch
 from testfixtures import LogCapture
 
 from decorators_library.decorators import (
-    timeout, memoized, count_calls, inspect)
-from decorators_library.exceptions import FunctionTimeoutException
+    timeout, memoized, count_calls, inspect, contract, logRunTime)
+from decorators_library.exceptions import (FunctionTimeoutException, NotNumericException, NotStringException)
 
 
 class CaptureOutput(list):
@@ -163,7 +163,41 @@ class MemoizedDecoratorTestCase(unittest.TestCase):
         with patch.dict(add.cache, {(1, 2): 6}):
             self.assertEqual(add(1, 2), 6, "Not using cached value")
 
+class ContractDecoratorTestCase(unittest.TestCase):
+    def test_contract(self):
+        @contract("numeric")
+        def func(a, b):
+            return [a, b]
 
+        self.assertEqual(func(1,2), [1,2])
+        self.assertEqual(func(a = 1 , b = 2), [1,2])
+        with self.assertRaisesRegexp(NotNumericException ,''):
+            func('a','b')
+        with self.assertRaisesRegexp(NotNumericException ,''):
+            func(1, 'b')
+        
+        @contract("string")
+        def func(a, b):
+            return [a, b]
+
+        self.assertEqual(func('a','b'), ['a', 'b'])
+        self.assertEqual(func(a = 'a' , b = 'b'), ['a', 'b'])
+        with self.assertRaisesRegexp(NotStringException ,''):
+            func(1,2)
+        with self.assertRaisesRegexp(NotStringException ,''):
+            func(1, 'b')
+
+class logRunTimeDecoratorTestCase(unittest.TestCase):
+
+    def test_runtime(self):
+        @logRunTime
+        def very_slow_function():
+            time.sleep(1)
+        self.assertEqual(1, 1)
+
+
+
+            
 # from decorators_library.decorators import debug
 #
 #
