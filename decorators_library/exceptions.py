@@ -1,2 +1,2 @@
-class FunctionTimeoutException():
+class FunctionTimeoutException(Exception):
     pass

@@ -1,14 +1,33 @@
-# implement your decorators here.
-def timeout():
-    pass
+import signal
+import time
+from decorators_library.exceptions import FunctionTimeoutException
 
 
-class memoized():
-    
+class timeout(object):
+
+    def __init__(self, time_limit, exception=FunctionTimeoutException):
+        self.time_limit = time_limit
+        self.exception = exception
+
+    def raise_timeout_exception(self, signum, stack):
+        raise self.exception('Function call timed out')
+
+    def __call__(self, fn):
+        def wrapper(*args, **kwargs):
+            signal.signal(signal.SIGALRM, self.raise_timeout_exception)
+            signal.alarm(self.time_limit)
+            result = fn(*args, **kwargs)
+            signal.alarm(0)
+            return result
+        return wrapper
+
+
+class memoized(object):
+
     def __init__(self, fn):
         self.fn = fn
         self.cache = {}
-        
+
     def __call__(self, *args):
         if args in self.cache:
             return self.cache[args]
