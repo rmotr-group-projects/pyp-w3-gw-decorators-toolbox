@@ -1,6 +1,6 @@
 import signal
 import time
-from decorators_library.exceptions import FunctionTimeoutException
+from exceptions import FunctionTimeoutException
 
 
 class timeout(object):
@@ -74,5 +74,15 @@ def inspect(fn):
         result = fn(*args, **kwargs)
         print('{} invoked with {}. Result: {}'.format(fn.__name__, all_args,
                                                       result))
+        return fn(*args, **kwargs)
+    return wrapper
+
+
+def countdown(fn):
+    def wrapper(*args, **kwargs):
+        COUNTDOWN_SECONDS = 10
+        for num in range(COUNTDOWN_SECONDS, 0, -1):
+            print('{}'.format(num))
+            time.sleep(1)
         return fn(*args, **kwargs)
     return wrapper

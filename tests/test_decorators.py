@@ -13,7 +13,7 @@ from mock import patch
 from testfixtures import LogCapture
 
 from decorators_library.decorators import (
-    timeout, memoized, count_calls, inspect)
+    timeout, memoized, count_calls, inspect, countdown)
 from decorators_library.exceptions import FunctionTimeoutException
 
 
@@ -194,3 +194,16 @@ class MemoizedDecoratorTestCase(unittest.TestCase):
 #             res = my_add(1, 2)
 #             capture.check()  # nothing was logged
 #         self.assertEqual(res, 3)
+
+
+class CountdownTestCase(unittest.TestCase):
+    def test_countdown(self):
+        @countdown
+        def launch_rocket():
+            print("BLASTOFF!")
+
+        before = time.time()
+        launch_rocket()
+        after = time.time()
+        total = before - after
+        self.assertTrue(total < 10, "Function run time less than countdown")
