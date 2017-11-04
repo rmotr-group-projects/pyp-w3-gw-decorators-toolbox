@@ -11,7 +11,7 @@ class Timeout(object):
     
     @staticmethod
     def receive_alarm(signum, stack):
-        print 'Alarm :', time.ctime()
+        print 'Alarm :', time.time()
         
     def __call__(self, fn):
         def wrap_fn():
@@ -38,10 +38,8 @@ class Timeout(object):
             return f
         return wrap_fn
 
-
 # An instance of Timeout class        
 timeout = Timeout
-
 
 def inspect(fn):
     def _print(*args, **kwargs):
@@ -68,10 +66,8 @@ class Memoized(object):
     self.cache[args] = self.fn(*args, **kwargs)
     
     return self.fn(*args, **kwargs)
-  
 
 memoized = Memoized
-
 
 class Count_calls(object):
     counts = {}
