@@ -74,7 +74,7 @@ def inspect(fn):
         result = fn(*args, **kwargs)
         print('{} invoked with {}. Result: {}'.format(fn.__name__, all_args,
                                                       result))
-        return fn(*args, **kwargs)
+        return result
     return wrapper
 
 
