@@ -31,7 +31,7 @@ class Timeout(object):
                     
                 texc_end = time.time()
                
-                if texc_end - texc_begin < 3:
+                if texc_end - texc_begin > 3:
                     return "Function allowed to execute past timeout."
             else:
                 raise self.exception('Function call timed out')
