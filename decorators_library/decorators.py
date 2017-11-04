@@ -1,6 +1,6 @@
 import signal
 import time
-from exceptions import FunctionTimeoutException
+from decorators_library.exceptions import FunctionTimeoutException
 
 
 class timeout(object):
