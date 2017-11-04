@@ -39,6 +39,7 @@ class Timeout(object):
             return f
         return wrap_fn
 
+
 # An instance of Timeout class        
 timeout = Timeout
 
