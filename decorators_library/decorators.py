@@ -12,7 +12,7 @@ class Timeout(object):
     
     @staticmethod
     def receive_alarm(signum, stack):
-        print('Alarm :', time.ctime())
+        print('Alarm: {}'.format(time.ctime()))
         
     def __call__(self, fn):
         def wrap_fn():
