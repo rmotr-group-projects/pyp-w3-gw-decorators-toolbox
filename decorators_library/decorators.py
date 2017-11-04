@@ -86,3 +86,15 @@ def countdown(fn):
             time.sleep(1)
         return fn(*args, **kwargs)
     return wrapper
+
+
+def timer(fn):
+    def wrapper(*args, **kwargs):
+        before_time = time.time()
+        result = fn(*args, **kwargs)
+        after_time = time.time()
+        total_time = after_time - before_time
+        print('Function took {} seconds to run.'
+              .format(total_time))
+        return result
+    return wrapper
