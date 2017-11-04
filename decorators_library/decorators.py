@@ -18,20 +18,22 @@ class Timeout(object):
         def wrap_fn():
             tb = time.time()
             f = fn()
-            ta = time.time()
+            
             
             signal.signal(signal.SIGALRM, Timeout.receive_alarm)
             signal.alarm(2)
+            
+            ta = time.time()
 
             if self.exception == FunctionTimeoutException:
-                texc_begin = time.time()
+                #texc_begin = time.time()
                 
                 if ta-tb > self._time:
                     raise self.exception("Function call timed out")
                     
-                texc_end = time.time()
+                #texc_end = time.time()
                
-                if texc_end - texc_begin > 3:
+                if ta-tb > 3:
                     return "Function allowed to execute past timeout."
             else:
                 raise self.exception('Function call timed out')
