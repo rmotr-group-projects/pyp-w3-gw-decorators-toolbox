@@ -4,6 +4,7 @@ import signal
 from decorators_library.exceptions import FunctionTimeoutException
 # implement your decorators here.
 
+
 class Timeout(object):
     def __init__(self, _time, exception = FunctionTimeoutException):
         self._time = _time
@@ -11,7 +12,7 @@ class Timeout(object):
     
     @staticmethod
     def receive_alarm(signum, stack):
-        print 'Alarm :', time.time()
+        print('Alarm :', time.ctime())
         
     def __call__(self, fn):
         def wrap_fn():
