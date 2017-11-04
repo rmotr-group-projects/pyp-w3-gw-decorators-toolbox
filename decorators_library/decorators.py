@@ -3,8 +3,19 @@ def timeout():
     pass
 
 
-def memoized():
-    pass
+class memoized():
+    
+    def __init__(self, fn):
+        self.fn = fn
+        self.cache = {}
+        
+    def __call__(self, *args):
+        if args in self.cache:
+            return self.cache[args]
+
+        new_fn = self.fn(*args)
+        self.cache[args] = new_fn
+        return new_fn
 
 
 class count_calls(object):
