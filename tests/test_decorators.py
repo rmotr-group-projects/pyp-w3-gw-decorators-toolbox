@@ -3,7 +3,7 @@ import sys
 import time
 import unittest
 import logging
-
+from random import randint
 try:
     from StringIO import StringIO
 except ImportError:
@@ -13,7 +13,7 @@ from mock import patch
 from testfixtures import LogCapture
 
 from decorators_library.decorators import (
-    timeout, memoized, count_calls, inspect)
+    timeout, memoized, count_calls, inspect, trade_log, event_processor)
 from decorators_library.exceptions import FunctionTimeoutException
 
 
@@ -163,7 +163,78 @@ class MemoizedDecoratorTestCase(unittest.TestCase):
         with patch.dict(add.cache, {(1, 2): 6}):
             self.assertEqual(add(1, 2), 6, "Not using cached value")
 
+class TradeLogTestCase(unittest.TestCase):
+    def test_trade_log(self):
+        @trade_log
+        def strategy_one(a, rand_int=randint(0,9)):
+            if rand_int > a:
+                position = 'Buy'
+            else:
+                position = 'Sell'
+                a = -a
+            trade_handler = {
+                'Direction' : position,
+                'Size' : a
+            }
+            return trade_handler
+        @trade_log
+        def strategy_two(a, rand_int=randint(0,9)):
+            if rand_int > a:
+                position = 'Buy'
+            else:
+                position = 'Sell'
+                a = -a
+            trade_handler = {
+                'Direction' : position,
+                'Size' : a
+            }
+            return trade_handler
+        self.assertEqual(strategy_one(2, 3), {'Direction': 'Buy', 'Size': 2})
+        self.assertEqual(strategy_one(5,4), {'Direction': 'Sell', 'Size': -5})
+        self.assertEqual(trade_log.net_long_short(), -3)
+        self.assertEqual(strategy_two(4, 6), {'Size': 4, 'Direction': 'Buy'})
+        self.assertEqual(strategy_one.strategy_position(), {'strategy_one': -3})
+        self.assertEqual(strategy_two.strategy_position(), {'strategy_two': 4})
 
+class EventProcessorTest(unittest.TestCase):
+    def test_events(self):
+        @event_processor(look_back=5)
+        def event(price, volume):
+            return_dict = {
+                'price' : price,
+                'volume' : volume,
+            }
+            return return_dict
+        event(2,2)
+        event(2,2)
+        event(3,5)
+        event(2,7)
+        event(1,8)
+        self.assertEqual(event(2,10), 2.0)
+        
+    def test_events_look_back_change(self):
+        @event_processor(look_back=3)
+        def event(price, volume):
+            return_dict = {
+                'price' : price,
+                'volume' : volume,
+            }
+            return return_dict
+        event(3,2)
+        event(3,2)
+        event(1,5)
+        event(0,7)
+        event(4,8)
+        self.assertEqual(event(5,10), 3.0) #look_back limited to last 3 events
+        
+        
+# test = strategy_one(2)
+# test2 = strategy_one(3)
+# test3 = strategy_two(4, 6)
+# print(trade_log.position())
+# print(trade_log.net_long_short())
+# print(strategy_one.strategy_position())
+# print(strategy_two.strategy_position())
 # from decorators_library.decorators import debug
 #
 #
