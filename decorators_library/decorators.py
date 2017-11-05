@@ -7,17 +7,16 @@ class timeout(object):
     def __init__(self, value, exception=FunctionTimeoutException):
         self.value = value
         self.exception = exception
+        
+    def receive_alarm(self, signum, stack):
+        raise self.exception('Function call timed out')
 
-       
     def __call__(self, func):
         def wrapped(*args, **kwargs):
-            def alarm(signum, stack):
-                raise FunctionTimeoutException('Function call timed out')
-             
-            signal.signal(signal.SIGALRM, alarm)
+            signal.signal(signal.SIGALRM, self.receive_alarm)
             signal.alarm(self.value)
-            
             return func(*args, **kwargs)
+        signal.alarm(0)
         return wrapped
         
         
