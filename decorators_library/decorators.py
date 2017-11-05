@@ -3,7 +3,7 @@ import time
 import functools
 from random import randint
 import datetime
-from exceptions import FunctionTimeoutException
+from .exceptions import FunctionTimeoutException
 import signal
 #from exceptions import FunctionTimeoutException
 
