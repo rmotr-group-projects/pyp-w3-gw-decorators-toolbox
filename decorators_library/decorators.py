@@ -4,7 +4,7 @@ import logging
 from .exceptions import FunctionTimeoutException
 
 class timeout(object):
-    def __init__(self, value, exception=FunctionTimeoutException()):
+    def __init__(self, value, exception=FunctionTimeoutException):
         self.value = value
         self.exception = exception
 
