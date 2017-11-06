@@ -9,38 +9,18 @@ class Timeout(object):
     def __init__(self, _time, exception = FunctionTimeoutException):
         self._time = _time
         self.exception = exception
-    
-    @staticmethod
-    def receive_alarm(signum, stack):
-        print('Alarm: {}'.format(time.ctime()))
+
+    def handler(self, signum, stack):
+        raise self.exception("Function call timed out")
         
     def __call__(self, fn):
         def wrap_fn():
-            tb = time.time()
-            #f = fn()
-            
-            
-            signal.signal(signal.SIGALRM, Timeout.receive_alarm)
+            signal.signal(signal.SIGALRM, self.handler)
             signal.alarm(self._time)
             
             f = fn()
             
             signal.alarm(0)
-            
-            ta = time.time()
-
-            if self.exception == FunctionTimeoutException:
-                #texc_begin = time.time()
-                
-                if ta-tb > self._time:
-                    raise self.exception("Function call timed out")
-                    
-                #texc_end = time.time()
-               
-                if ta-tb > 3:
-                    return "Function allowed to execute past timeout."
-            else:
-                raise self.exception('Function call timed out')
             
             return f
         return wrap_fn
