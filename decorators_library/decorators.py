@@ -17,11 +17,15 @@ class Timeout(object):
     def __call__(self, fn):
         def wrap_fn():
             tb = time.time()
-            f = fn()
+            #f = fn()
             
             
             signal.signal(signal.SIGALRM, Timeout.receive_alarm)
-            signal.alarm(2)
+            signal.alarm(self._time)
+            
+            f = fn()
+            
+            signal.alarm(0)
             
             ta = time.time()
 
