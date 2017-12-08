@@ -61,3 +61,7 @@ target/
 #Ipython Notebook
 .ipynb_checkpoints
 .~c9*
+
+.idea
+decorators_library/thingy.py
+tests/test_mine.py
