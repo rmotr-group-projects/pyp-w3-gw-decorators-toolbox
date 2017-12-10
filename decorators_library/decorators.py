@@ -1,10 +1,11 @@
 import signal
 import os
 import logging
+import inspect as std_inspect
 
 from collections import Hashable, defaultdict
 from functools import wraps
-from .exceptions import FunctionTimeoutException
+from decorators_library.exceptions import FunctionTimeoutException
 
 
 def inspect(func):
@@ -93,51 +94,96 @@ def count_calls(func):
     return inner
 
 
-# class debug(object):
-#     """
-#     Decorator.  Logs a message before starting the execution including given params, and a
-#     second message after the execution is finished with the returned result
-#     TODO: Finish this
-#     """
-#
-#     def __init__(self, func, logger=None):
-#         self.func = func
-#         self.logger = logger
-#
-#     def __call__(self, *args, **kwargs):
-#         if not self.logger:
-#             logging.basicConfig(level=logging.DEBUG)
-#             self.logger = logging.getLogger(self.func.__module__)
-#
-#         @wraps(self.func)
-#         def wrapper():
-#             self.logger.debug('Executing "{}" with params: {}, {}'.format(self.func.__name__, args, kwargs))
-#             res = self.func(*args, **kwargs)
-#             self.logger.debug('Finished "{}" execution with result: {}'.format(self.func.__name__, res))
-#             return res
-#
-#         return wrapper()
-
-
-def debug(logger=None):
+class debug(object):
     """
-    Decorator.  Logs the decorated function and arguments to the debug stream before and after execution.
-    Optionally receives a custom logger.
+    Decorator.  Logs a message before starting the execution including given params, and a
+    second message after the execution is finished with the returned result
     """
 
-    def wrapper(func):
-        nonlocal logger
-        if not logger:
-            logger = logging.basicConfig(level=logging.DEBUG)
-            logger = logging.getLogger(func.__module__)
+    def __init__(self, logger=None):
+        self.logger = logger
+
+    def __call__(self, func):
+        if not self.logger:
+            logging.basicConfig(level=logging.DEBUG)
+            self.logger = logging.getLogger(func.__module__)
 
         @wraps(func)
-        def inner(*args, **kwargs):
-            logger.debug('Executing "{}" with params: {}, {}'.format(func.__name__, args, kwargs))
+        def wrapper(*args, **kwargs):
+            self.logger.debug('Executing "{}" with params: {}, {}'.format(func.__name__, args, kwargs))
             res = func(*args, **kwargs)
-            logger.debug('Finished "{}" execution with result: {}'.format(func.__name__, res))
+            self.logger.debug('Finished "{}" execution with result: {}'.format(func.__name__, res))
             return res
 
-        return inner
+        return wrapper
+
+
+# Function based implementation of the debug decorator
+#
+# def debug(logger=None):
+#     """
+#     Decorator.  Logs the decorated function and arguments to the debug stream before and after execution.
+#     Optionally receives a custom logger.
+#     """
+#     debug.logger = logger
+#
+#     def wrapper(func):
+#         logger = debug.logger
+#         if not logger:
+#             logger = logging.basicConfig(level=logging.DEBUG)
+#             logger = logging.getLogger(func.__module__)
+#
+#         @wraps(func)
+#         def inner(*args, **kwargs):
+#             logger.debug('Executing "{}" with params: {}, {}'.format(func.__name__, args, kwargs))
+#             res = func(*args, **kwargs)
+#             logger.debug('Finished "{}" execution with result: {}'.format(func.__name__, res))
+#             return res
+#
+#         return inner
+#
+#     return wrapper
+
+
+def add_method(cls, instance_method=True):
+    """
+    Decorator.  Adds the decorated function to the passed in class, will insert self
+    param if missing and the method is to be an instance method.
+    """
+
+    def wrapper(method):
+        method_params = std_inspect.getargspec(method).args
+
+        if instance_method and 'self' not in method_params:
+            @wraps(method)
+            def new_method(self, *args, **kwargs):
+                return method(*args, **kwargs)
+
+            setattr(cls, method.__name__, new_method)
+        elif instance_method:
+            setattr(cls, method.__name__, method)
+        else:
+            @staticmethod
+            def new_method(*args, **kwargs):
+                return method(*args, **kwargs)
+
+            setattr(cls, method.__name__, new_method)
+        return cls
 
     return wrapper
+
+
+def singleton(cls):
+    """
+    Decorator.  Returns an already created instance of the decorated class if one exists
+    """
+    instances = dict()
+
+    @wraps(cls)
+    def check_instance(*args, **kwargs):
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+            return instances[cls]
+        return instances[cls]
+
+    return check_instance

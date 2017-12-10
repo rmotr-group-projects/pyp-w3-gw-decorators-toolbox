@@ -12,7 +12,7 @@ except ImportError:
 from mock import patch
 from testfixtures import LogCapture
 
-from decorators_library.decorators import timeout, memoized, count_calls, inspect
+from decorators_library.decorators import timeout, memoized, count_calls, inspect, add_method, singleton
 from decorators_library.exceptions import FunctionTimeoutException
 
 
@@ -21,43 +21,44 @@ class CaptureOutput(list):
         self._stdout = sys.stdout
         sys.stdout = self._stringio = StringIO()
         return self
+
     def __exit__(self, *args):
         self.extend(self._stringio.getvalue().splitlines())
         del self._stringio
         sys.stdout = self._stdout
 
 
-# class TimeoutDecoratorTestCase(unittest.TestCase):
-#
-#     def test_timeout_doesnt_raise(self):
-#         @timeout(2)
-#         def very_slow_function():
-#             time.sleep(1)
-#         very_slow_function()
-#
-#     def test_timeout_raises_default_exception(self):
-#         @timeout(1)
-#         def very_slow_function():
-#             time.sleep(3)
-#
-#         before = time.time()
-#
-#         with self.assertRaisesRegexp(FunctionTimeoutException, 'Function call timed out'):
-#             very_slow_function()
-#
-#         after = time.time()
-#         self.assertTrue(after - before < 3, "Function allowed to execute past timeout.")
-#
-#     def test_timeout_raises_custom_exception(self):
-#         class MyCustomException(Exception):
-#             pass
-#
-#         @timeout(1, exception=MyCustomException)
-#         def very_slow_function():
-#             time.sleep(2)
-#         with self.assertRaisesRegexp(
-#             MyCustomException, 'Function call timed out'):
-#             very_slow_function()
+class TimeoutDecoratorTestCase(unittest.TestCase):
+
+    def test_timeout_doesnt_raise(self):
+        @timeout(2)
+        def very_slow_function():
+            time.sleep(1)
+        very_slow_function()
+
+    def test_timeout_raises_default_exception(self):
+        @timeout(1)
+        def very_slow_function():
+            time.sleep(3)
+
+        before = time.time()
+
+        with self.assertRaisesRegexp(FunctionTimeoutException, 'Function call timed out'):
+            very_slow_function()
+
+        after = time.time()
+        self.assertTrue(after - before < 3, "Function allowed to execute past timeout.")
+
+    def test_timeout_raises_custom_exception(self):
+        class MyCustomException(Exception):
+            pass
+
+        @timeout(1, exception=MyCustomException)
+        def very_slow_function():
+            time.sleep(2)
+        with self.assertRaisesRegexp(
+            MyCustomException, 'Function call timed out'):
+            very_slow_function()
 
 
 class InspectDecoratorTestCase(unittest.TestCase):
@@ -108,7 +109,8 @@ class CountCallsDecoratorTestCase(unittest.TestCase):
     def test_count_calls(self):
         @count_calls
         def my_func():
-           pass
+            pass
+
         my_func()
         my_func()
         my_func()
@@ -120,11 +122,11 @@ class CountCallsDecoratorTestCase(unittest.TestCase):
     def test_count_calls_multi_function(self):
         @count_calls
         def my_func():
-           pass
+            pass
 
         @count_calls
         def my_other_func():
-           pass
+            pass
 
         my_func()
         my_func()
@@ -139,7 +141,8 @@ class CountCallsDecoratorTestCase(unittest.TestCase):
     def test_count_calls_no_calls(self):
         @count_calls
         def my_func():
-           pass
+            pass
+
         self.assertEqual(my_func.counter(), 0)
         self.assertEqual(count_calls.counters(), {'my_func': 0})
         count_calls.reset_counters()
@@ -193,3 +196,77 @@ class DebugDecoratorTestCase(unittest.TestCase):
             res = my_add(1, 2)
             capture.check()  # nothing was logged
         self.assertEqual(res, 3)
+
+
+class AddMethodDecoratorTestCase(unittest.TestCase):
+    def test_add_method(self):
+        class SomeClass(object):
+
+            def __init__(self, some_var):
+                self.some_var = some_var
+
+            def a_method(self):
+                return self.some_var
+
+        @add_method(SomeClass)
+        def some_method(self, a, b):
+            return a + b
+
+        self.assertTrue('some_method' in SomeClass.__dict__.keys(), msg="The class did not contain the new method.")
+
+        classy = SomeClass(1)
+        self.assertEquals(classy.some_method(1, 2), 3, msg="The class did not execute the new method correctly.")
+
+    def test_add_method_missing_self(self):
+        class SomeClass(object):
+
+            def __init__(self, some_var):
+                self.some_var = some_var
+
+            def a_method(self):
+                return self.some_var
+
+        @add_method(SomeClass)
+        def some_method(a, b):
+            return a + b
+
+        self.assertTrue('some_method' in SomeClass.__dict__.keys(), msg="The class did not contain the new method.")
+
+        classy = SomeClass(1)
+        self.assertEquals(classy.some_method(1, 2), 3, msg="The class did not execute the new method correctly.")
+
+    def test_add_method_class_method(self):
+        class SomeClass(object):
+
+            def __init__(self, some_var):
+                self.some_var = some_var
+
+            def a_method(self):
+                return self.some_var
+
+        @add_method(SomeClass, instance_method=False)
+        def some_method(a, b):
+            return a + b
+
+        self.assertTrue('some_method' in SomeClass.__dict__.keys(), msg="The class did not contain the new method.")
+
+        classy = SomeClass(1)
+        self.assertEquals(SomeClass.some_method(1, 2), 3, msg="The class did not execute the new method correctly.")
+        self.assertEquals(classy.some_method(1, 2), 3, msg="The class did not execute the new method correctly.")
+
+
+class SingletonTestCase(unittest.TestCase):
+    def test_same_instance_returned(self):
+        @singleton
+        class TestClass(object):
+            counter = 0
+
+            def __init__(self):
+                TestClass.counter += 1
+                self.counter = TestClass.counter
+
+        first = TestClass()
+        self.assertEquals(first.counter, 1)
+
+        second = TestClass()
+        self.assertEquals(second.counter, 1)
