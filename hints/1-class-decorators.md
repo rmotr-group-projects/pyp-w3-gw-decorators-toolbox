@@ -18,7 +18,8 @@ class only_num_arguments(object):
         return wrapped
 
 
-@only_num_arguments(floats=False)
+@only_num_arguments(floats=True)
+#@only_num_arguments
 def add(x, y):
     return x + y
 ```
