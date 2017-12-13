@@ -82,13 +82,48 @@ class count_calls(object):
     def reset_counters(cls):
         cls.counters_record = {}
 
-# def memoized():
-#     pass
+
+class memoized(object):
+
+    previous_arguments = {}
+
+    def __init__(self, fn):
+        self.fn = fn
+
+    def __call__(self, a, b):
+        """Make class callable as a function"""
+
+        prev_arg = memoized.previous_arguments
+
+        if (a, b) in prev_arg:
+            return prev_arg[(a, b)]
+
+        else:
+
+            prev_arg[(a, b)] = self.fn(a, b)
+
+        return self.fn(a, b)
+
+    @property
+    def cache(self):
+        return memoized.previous_arguments
 
 
 # TESTING:
 
+# @memoized
+# # add = memoized(add)
+# def add(a, b):
+#     return a + b
+
+# print(add.cache)
+# print(dir(add))
+# print(add(1, 2))
+# print(add(3, 2))
+# print(add(1, 2))
+# print(add.cache)
+# # print(add.cache)
+
 # ====== OTHER DECORATORS TO IMPLEMENT ======
 # def debug():
 #     pass
-
