@@ -6,33 +6,26 @@ import logging
 
 def inspect(fn):
 
-    if fn.__name__ == 'my_add':
+    MESSAGE = "{} invoked with {}. Result: {}"
 
-        def decorated_fn(x, y):
+    def decorated_fn(*args, **kwargs):
 
-            print("my_add invoked with {}, {}. Result: {}".format(x, y, fn(x, y)))
-            return fn(x, y)
+        inputs = ", ".join(str(x) for x in args)
 
-        return decorated_fn
+        if not kwargs:
 
-    elif fn.__name__ == 'calculate':
+            print(MESSAGE.format(fn.__name__, inputs, fn(*args)))
+            return fn(*args)
 
-        def decorated_fn(*args, operation='add'):
+        # parse kwargs and include in MESSAGE
+        kwargs_list = ["{}={}".format(k, v) for k, v in kwargs.items()]
+        inputs += ', {}'.format(kwargs_list[0])
 
-            inputs = ", ".join(str(x) for x in args)
+        print(MESSAGE.format(fn.__name__, inputs, fn(*args, **kwargs)))
 
-            if operation == "add":
+        return fn(*args, **kwargs)
 
-                print("calculate invoked with {}. Result: {}".format(inputs, fn(*args, operation)))
-                return fn(*args, operation)
-
-            else:
-
-                print("calculate invoked with {}, operation={}. Result: {}".format(inputs, operation, fn(*args, operation='subtract')))
-
-                return fn(*args, operation)
-
-        return decorated_fn
+    return decorated_fn
 
 
 def timeout(sec, my_exception=FunctionTimeoutException):
@@ -112,8 +105,7 @@ class memoized(object):
 
 def debug(logger=None):
     """
-    - How does logging work???
-    -
+    - How does logging work??? what is it used for?
     """
 
     debug.logger = logger
