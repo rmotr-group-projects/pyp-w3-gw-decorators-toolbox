@@ -33,7 +33,7 @@ def timeout(t, exception=FunctionTimeoutException):
     return wrapper
   return time_decorator
   
-class count_calls(object):
+class count_calls():
   CALL_HISTORY = {}
   def __init__(self, func):
     self.func = func
@@ -54,7 +54,7 @@ class count_calls(object):
   def reset_counters(cls):
     cls.CALL_HISTORY = {}
     
-class memoized(object):
+class memoized():
   cache = {}
   def __init__(self, func):
     self.func = func
