@@ -1,10 +1,13 @@
-# implement your decorators here.
 import signal
 from decorators_library.exceptions import FunctionTimeoutException
 import logging
 
 
 def inspect(fn):
+    """
+    Decorator that outputs the inputs, result, and operation
+    of a calculation
+    """
 
     MESSAGE = "{} invoked with {}. Result: {}"
 
@@ -29,6 +32,11 @@ def inspect(fn):
 
 
 def timeout(sec, my_exception=FunctionTimeoutException):
+    """
+    Decorator that aborts the execution of a function
+    if it exceeds a given duration of time. Allows use of
+    custom exceptions.
+    """
 
     def receive_alarm(signum, stack):
         """Raise a timed out exception"""
@@ -49,6 +57,9 @@ def timeout(sec, my_exception=FunctionTimeoutException):
 
 
 class count_calls(object):
+    """
+    Decorator that keeps track of function calls
+    """
 
     counters_record = {}
 
@@ -78,6 +89,12 @@ class count_calls(object):
 
 
 class memoized(object):
+    """
+    Decorator that checks if arguments passed to a function
+    has previously been calculated. If it has, it returns the
+    previously calculated result. Otherwise, it calculates it and
+    stores it in a dictionary
+    """
 
     previous_arguments = {}
 
@@ -105,6 +122,8 @@ class memoized(object):
 
 def debug(logger=None):
     """
+    Decorator that debugs the executions of the decorated function.
+    Returns message before and after execution. Logger can be customized.
     - How does logging work??? what is it used for?
     """
 
