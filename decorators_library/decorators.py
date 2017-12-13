@@ -1,57 +1,58 @@
 # implement your decorators here.
-# import signal
-# from decorators_library.exceptions import FunctionTimeoutException
+import signal
+from decorators_library.exceptions import FunctionTimeoutException
+import logging
 
 
-# def inspect(fn):
+def inspect(fn):
 
-#     if fn.__name__ == 'my_add':
+    if fn.__name__ == 'my_add':
 
-#         def decorated_fn(x, y):
+        def decorated_fn(x, y):
 
-#             print("my_add invoked with {}, {}. Result: {}".format(x, y, fn(x, y)))
-#             return fn(x, y)
+            print("my_add invoked with {}, {}. Result: {}".format(x, y, fn(x, y)))
+            return fn(x, y)
 
-#         return decorated_fn
+        return decorated_fn
 
-#     elif fn.__name__ == 'calculate':
+    elif fn.__name__ == 'calculate':
 
-#         def decorated_fn(*args, operation='add'):
+        def decorated_fn(*args, operation='add'):
 
-#             inputs = ", ".join(str(x) for x in args)
+            inputs = ", ".join(str(x) for x in args)
 
-#             if operation == "add":
+            if operation == "add":
 
-#                 print("calculate invoked with {}. Result: {}".format(inputs, fn(*args, operation)))
-#                 return fn(*args, operation)
+                print("calculate invoked with {}. Result: {}".format(inputs, fn(*args, operation)))
+                return fn(*args, operation)
 
-#             else:
+            else:
 
-#                 print("calculate invoked with {}, operation={}. Result: {}".format(inputs, operation, fn(*args, operation='subtract')))
+                print("calculate invoked with {}, operation={}. Result: {}".format(inputs, operation, fn(*args, operation='subtract')))
 
-#                 return fn(*args, operation)
+                return fn(*args, operation)
 
-#         return decorated_fn
+        return decorated_fn
 
 
-# def timeout(sec, my_exception=FunctionTimeoutException):
+def timeout(sec, my_exception=FunctionTimeoutException):
 
-#     def receive_alarm(signum, stack):
-#         """Raise a timed out exception"""
-#         raise my_exception('Function call timed out')
+    def receive_alarm(signum, stack):
+        """Raise a timed out exception"""
+        raise my_exception('Function call timed out')
 
-#     def timeout_sec(fn):
+    def timeout_sec(fn):
 
-#         def decorated_fn():
+        def decorated_fn():
 
-#             signal.signal(signal.SIGALRM, receive_alarm)
-#             signal.alarm(sec)
+            signal.signal(signal.SIGALRM, receive_alarm)
+            signal.alarm(sec)
 
-#             fn()
+            fn()
 
-#         return decorated_fn
+        return decorated_fn
 
-#     return timeout_sec
+    return timeout_sec
 
 
 class count_calls(object):
@@ -109,21 +110,26 @@ class memoized(object):
         return memoized.previous_arguments
 
 
-# TESTING:
+def debug(logger=None):
+    """
+    - How does logging work???
+    -
+    """
 
-# @memoized
-# # add = memoized(add)
-# def add(a, b):
-#     return a + b
+    debug.logger = logger
 
-# print(add.cache)
-# print(dir(add))
-# print(add(1, 2))
-# print(add(3, 2))
-# print(add(1, 2))
-# print(add.cache)
-# # print(add.cache)
+    def wrapper(fn):
+        logger = debug.logger
+        if not logger:
+            logger = logging.basicConfig(level=logging.DEBUG)
+            logger = logging.getLogger(fn.__module__)
 
-# ====== OTHER DECORATORS TO IMPLEMENT ======
-# def debug():
-#     pass
+        def inner(*args, **kwargs):
+            logger.debug('Executing "{}" with params: {}, {}'.format(fn.__name__, args, kwargs))
+            results = fn(*args, **kwargs)
+            logger.debug('Finished "{}" execution with result: {}'.format(fn.__name__, results))
+            return results
+
+        return inner
+
+    return wrapper
