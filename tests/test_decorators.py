@@ -13,6 +13,7 @@ from mock import patch
 from testfixtures import LogCapture
 
 from decorators_library.decorators import (timeout, memoized, count_calls, inspect)
+# from decorators_library.decorators import (memoized, count_calls, inspect)
 from decorators_library.exceptions import FunctionTimeoutException
 
 
