@@ -1,0 +1,2 @@
+class FunctionTimeoutException(Exception):
+  pass
