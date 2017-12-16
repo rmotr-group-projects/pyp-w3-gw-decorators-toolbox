@@ -89,26 +89,33 @@ class memoized(object):
             return self.func(x,y)
 
 
-def debug(op):
-    def add(x, y):
-        print("Executing '{}' with params: ({}, {}), {{}}".format(op.__name__, x, y))
-        return x + y 
+import logging 
 
-    def opx(x,y):
-        #result = add(x,y)
-        print("Executing '{}' with params: ({}, {}), {{}}".format(op.__name__, x, y))
-        print("Finished '{}' execution with result: {}".format(op.__name__, op(x,y)))
-        return op
-    return opx
-        
-# @debug
-# def my_add(a,b):
-#     return  a + b
+def debug(logger = None ):
+    
+    def wrapper(op):
+        logger_ = logger
+        if not logger_:
+            logging.basicConfig(filename = 'example.log', level = logging.DEBUG)
+            logger_ = logging.getLogger(op.__module__)
+    
+        def opx(x,y):
+            #result = add(x,y)
+            print('Executing "{}" with params: ({}, {}), {{}}'.format(op.__name__, x, y))
+            logger_.debug('Executing "{}" with params: ({}, {}), {{}}'.format(op.__name__, x, y))
+            result = op(x,y)
+            logger_.debug('Finished "{}" execution with result: {}'.format(op.__name__, result))
+            print('Finished "{}" execution with result: {}'.format(op.__name__, result))
+            return op(x,y)
+        return opx
+    return wrapper    
+@debug()
+def my_add(a, b):
+    return a + b
 
-# res = my_add(1, 2)
+print(my_add(1, 2))
 # #print(res)
 
-
-
+#print(my_add.__name__)
 
 
