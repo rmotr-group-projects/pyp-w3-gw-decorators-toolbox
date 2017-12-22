@@ -181,16 +181,16 @@ class DebugDecoratorTestCase(unittest.TestCase):
             )
         self.assertEqual(res, 3)
 
-    # def test_debug_custom_logger(self):
-    #     logging.basicConfig()
-    #     error_logger = logging.getLogger('test_decorators.error_logger')
-    #     error_logger.setLevel(logging.ERROR)
+    def test_debug_custom_logger(self):
+        logging.basicConfig()
+        error_logger = logging.getLogger('test_decorators.error_logger')
+        error_logger.setLevel(logging.ERROR)
 
-    #     @debug(logger=error_logger)
-    #     def my_add(a, b):
-    #         return a + b
+        @debug(logger=error_logger)
+        def my_add(a, b):
+            return a + b
 
-    #     with LogCapture() as capture:
-    #         res = my_add(1, 2)
-    #         capture.check()  # nothing was logged
-    #     self.assertEqual(res, 3)
+        with LogCapture() as capture:
+            res = my_add(1, 2)
+            capture.check()  # nothing was logged
+        self.assertEqual(res, 3)
