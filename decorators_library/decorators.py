@@ -1,12 +1,16 @@
-from decorators_library.exceptions import FunctionTimeoutException
+if __name__ == '__main__':
+    from exceptions import FunctionTimeoutException
+else:
+    from decorators_library.exceptions import FunctionTimeoutException
 import functools
 import time
 import sys
 import signal
+import logging
 
 # PYTHONPATH=. py.test -s tests/ -k
 
-
+################################################################################
 # class timeout(object):
 #     def __init__(self, time_limit, exception=FunctionTimeoutException, message='Function call timed out'):
 #         # print('Hello from __init__')
@@ -28,6 +32,7 @@ import signal
         
 #     def _raise_exc(self, signum, stack):
 #         raise self.exception
+###########
 
 def timeout(time_limit, exception=FunctionTimeoutException, message='Function call timed out'):
     """Decorator that raises an exception is the decorated function's execution
@@ -68,7 +73,7 @@ def timeout(time_limit, exception=FunctionTimeoutException, message='Function ca
 # print('number = {}'.format(number))
 
 
-################################################################################
+###########
 # class timeout(object):
 #     def __init__(self, func):
 #         self.func = func
@@ -152,9 +157,13 @@ class count_calls(object):
 # count_calls.reset_counters()
 # print('executing count_calls.reset_counters()')
 # print('count_calls.counters() = {}'.format(count_calls.counters()))
-
+################################################################################
 
 def inspect(op):
+    """This decorator is prints the decorated function's name, parameters, and 
+    calculated value to the screen."""
+    
+    @functools.wraps(op)
     def wrapped(a, b, operation='add'):
         if operation == 'add':
             result = op(a, b)
@@ -163,6 +172,7 @@ def inspect(op):
             result = op(a, b, operation)
             print('{} invoked with {}, {}, operation={}. Result: {}'.format(op.__name__, a, b, operation, result))
         return result
+        
     return wrapped
     
 # @inspect
@@ -171,16 +181,31 @@ def inspect(op):
 #         return a + b
 #     if operation == 'subtract':
 #         return a - b
-        
-# calculate(5, 4)
+
+# help(calculate)
+# calculate(5, 4, operation='add')
+################################################################################
+
+
 
 class memoized(object):
-    
+    """This decorator keeps track of previous executions of the decorated 
+    function and the result of the invokations. If the decorated function is 
+    executed again using the same set of arguments sent in the past, the result 
+    must be immediately returned by an internal cache instead of re-executing 
+    the same code again."""
     def __init__(self, function):
         self.function = function
         self.function_name = function.__name__
         self.cache = {}
-        print('function name =', self.function_name)
+        # print('function name =', self.function_name)
+        
+        # Note: When using class decorators, calling help() on the decorated
+        # function will still bring up information on the decorated class.
+        # However, the decorated function's __name__ and __doc__ attributes
+        # will be updated.
+        # https://stackoverflow.com/questions/25973376/functools-update-wrapper-doesnt-work-properly/25973438#25973438
+        functools.update_wrapper(self, function)
     
     def __call__(self, *args, **kwargs):
         sorted_args = tuple(sorted(args))
@@ -196,7 +221,11 @@ class memoized(object):
 
 # @memoized
 # def func1(num):
-#     pass
+    # """Function used to test the memoize decorator."""
+    # pass
+# help(func1)
+# print(func1.__name__)
+# print(func1.__doc__)
 # print('executing func1')
 # func1(1)
 # print()
@@ -210,6 +239,35 @@ class memoized(object):
 
 # print('executing func1 again')
 # func1(1)
+################################################################################
 
+# logging.basicConfig(level=logging.DEBUG, format='%(module)s:%(levelname)s:%(message)s')
 
+class debug(object):
+    """This decorator debugs the executions of the decorated function by 
+    logging a message before starting the execution (function name, args, 
+    kwargs), and a second message after the execution is finished with the 
+    returned result (function name, returned value)."""
+    def __init__(self, logger=None):
+        self.logger = logger
+    
+    def __call__(self, function, *args, **kwargs):
+        if not self.logger:
+            logging.basicConfig()
+            self.logger = logging.getLogger(function.__module__)
+            self.logger.setLevel(logging.DEBUG)
+        
+        def wrapped(*args, **kwargs):
+            self.logger.debug('Executing "{}" with params: {}, {}'.format(function.__name__, args, kwargs))
+            result = function(*args, **kwargs)
+            self.logger.debug('Finished "{}" execution with result: {}'.format(function.__name__, result))
+            return result
+        return wrapped
+        
+# @debug()
+# def my_add(a, b):
+#     return a + b
+    
+# my_add(1, 2)
 
+# print('__name__ = {}'.format(__name__))
