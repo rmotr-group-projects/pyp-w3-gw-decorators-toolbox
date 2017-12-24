@@ -1,4 +1,5 @@
 import functools
+import collections
 
 def inspect(function):
     @functools.wraps(function)
@@ -12,11 +13,28 @@ def inspect(function):
         return result
     return wrapper
 
-def memoized():
-    pass
 
-def count_calls():
-    pass
+class memoized(object):
+    def __init__(self, function):
+        self.function = function
+        self.cache = {}
+    
+    def __call__(self, *args):
+        if not isinstance(args, collections.Hashable):
+            return self.function(args)
+        if args in self.cache:
+            return self.cache[args]
+        else:
+            value = self.function(*args)
+            self.cache[args] = value
+            return value
+
+class count_calls(object):
+    def __init__():
+        pass
+    
+    def __call__():
+        pass
 
 def timeout():
     pass
