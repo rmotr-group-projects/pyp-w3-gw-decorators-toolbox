@@ -30,17 +30,19 @@ class timeout(object):
     def raise_exception(self, signum, stack):
         raise self.exception("Function call timed out")
         
-def debug(logger = None):
-    def dec(orig_fn):
-        def wrapper(*args, **kwargs):
-            if logger == None:
-                print('Executing "{}" with params: {}, {}'.format(orig_fn.__name__, args, kwargs))
-                print('Finished "{}" execution with result: {}'.format(orig_fn.__name__, orig_fn(*args, **kwargs)))
-                return orig_fn(*args, **kwargs)
-            else:
-                return orig_fn(*args, **kwargs)
+class debug(object):
+    def __init__(self, logger=None):
+        self.logger = logger 
+    
+    def __call__(self, orig_fn):
+        def wrapper(*args, **kwargs): 
+            result = orig_fn(*args, **kwargs)
+            if self.logger is None: 
+                self.logger = logging.getLogger(orig_fn.__module__)
+            self.logger.debug('Executing "{}" with params: {}, {}'.format(orig_fn.__name__, args, kwargs))
+            self.logger.debug('Finished "{}" execution with result: {}'.format(orig_fn.__name__, result))
+            return result
         return wrapper
-    return dec
     
 class memoized(object):
     def __init__(self, orig_fn):
