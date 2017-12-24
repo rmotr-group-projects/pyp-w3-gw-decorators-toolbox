@@ -30,11 +30,29 @@ class memoized(object):
             return value
 
 class count_calls(object):
-    def __init__():
-        pass
+    FUNCTION_COUNTERS = {}
     
-    def __call__():
-        pass
+    def __init__(self, function):
+        self.function = function
+        self.calls = 0
+        count_calls.FUNCTION_COUNTERS[function] = self
+        
+    
+    def __call__(self, *args, **kwargs):
+        self.calls += 1
+        return self.function(*args, **kwargs)
+    
+    def counter(self):
+        return count_calls.FUNCTION_COUNTERS[self.function].calls
+    
+    @classmethod
+    def counters(cls):
+        return dict([(f.__name__, cls.FUNCTION_COUNTERS[f].calls)
+                     for f in cls.FUNCTION_COUNTERS])
+    
+    @classmethod
+    def reset_counters(cls):
+        cls.FUNCTION_COUNTERS = {}
 
 def timeout():
     pass
