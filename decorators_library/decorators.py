@@ -15,6 +15,7 @@ def inspect(function):
         return result
     return wrapper
 
+
 class timeout(object):
     def __init__(self, duration, exception=FunctionTimeoutException):
         self.duration = duration
